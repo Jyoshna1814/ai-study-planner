@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>AI Study Planner</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<link rel="stylesheet" href="style.css">
+
+<link rel="manifest" href="manifest.json">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>📚 AI Smart Study Planner</h1>
+
+<!-- LOGIN / SIGNUP -->
+<div id="authBox">
+
+<input id="username" placeholder="Username">
+
+<input id="password" type="password" placeholder="Password">
+
+<button onclick="signup()">Signup</button>
+
+<button onclick="login()">Login</button>
+
+</div>
+
+<button id="logoutBtn" onclick="logout()" style="display:none;">Logout</button>
+
+
+<hr>
+
+<!-- SUBJECT INPUT -->
+<h2>Add Subject</h2>
+
+<input id="subjectInput" placeholder="Subject name">
+
+<input id="difficultyInput" type="number" placeholder="Difficulty (1-5)">
+
+<input id="weightageInput" type="number" placeholder="Weightage (%)">
+
+<button onclick="addSubject()">Add</button>
+
+<ul id="subjectList"></ul>
+
+<!-- AI STUDY PLAN -->
+<div>
+
+<h2>AI Study Plan</h2>
+
+<input id="examDate" type="date">
+
+<input id="studyHours" placeholder="Hours per day">
+
+<button onclick="generatePlan()">Generate Plan</button>
+
+<div id="planResult"></div>
+
+</div>
+
+<hr>
+
+<h2>Study Progress Analytics</h2>
+
+<canvas id="progressChart"></canvas>
+
+<!-- POMODORO -->
+<hr>
+
+<h2>Pomodoro Timer</h2>
+
+<div class="timer-box">
+
+<h1 id="timer">25:00</h1>
+
+<button onclick="startTimer()">Start</button>
+
+<button onclick="stopTimer()">Stop</button>
+
+<button onclick="resetTimer()">Reset</button>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
