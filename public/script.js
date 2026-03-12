@@ -57,18 +57,7 @@ alert("Login failed")
 })
 
 }
-function logout(){
 
-currentUser=null
-
-localStorage.removeItem("user")
-
-document.getElementById("authBox").style.display="block"
-document.getElementById("logoutBtn").style.display="none"
-
-document.getElementById("subjectList").innerHTML=""
-
-}
 function addSubject(){
 
 let subject=document.getElementById("subjectInput").value
@@ -332,7 +321,49 @@ loadSubjects()
 }
 
 }
-if ("serviceWorker" in navigator) {
-navigator.serviceWorker.register("sw.js")
-.then(() => console.log("Service Worker Registered"))
+function generateTimetable(){
+
+fetch("/subjects/" + currentUser.username)
+.then(res => res.json())
+.then(subjects => {
+
+let examDate = document.getElementById("examDate").value
+let hours = document.getElementById("studyHours").value
+
+fetch("/generate-timetable",{
+
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+subjects:subjects,
+examDate:examDate,
+hoursPerDay:hours
+})
+
+})
+.then(res=>res.json())
+.then(data=>{
+
+let result = document.getElementById("planResult")
+
+result.innerHTML=""
+
+data.timetable.forEach(day=>{
+
+let div=document.createElement("div")
+
+div.innerHTML="<h3>Day "+day.day+"</h3>"
+
+day.plan.forEach(p=>{
+div.innerHTML+=p.subject+" - "+p.hours+"h <br>"
+})
+
+result.appendChild(div)
+
+})
+
+})
+
+})
+
 }

@@ -171,8 +171,60 @@ app.get("/", (req,res)=>{
 res.sendFile(__dirname + "/public/index.html")
 })
 
-const PORT = 3000
+const PORT = process.env.PORT || 3000
 
-app.listen(PORT,()=>{
-console.log("Server running on port " + PORT)
+app.post("/generate-timetable", (req, res) => {
+
+const { subjects, examDate, hoursPerDay } = req.body
+
+const today = new Date()
+const exam = new Date(examDate)
+
+const daysLeft = Math.ceil((exam - today) / (1000 * 60 * 60 * 24))
+
+if (daysLeft <= 0) {
+return res.json({ message: "Exam date already passed" })
+}
+
+let timetable = []
+
+for (let d = 0; d < daysLeft; d++) {
+
+let dayPlan = []
+
+let remainingHours = hoursPerDay
+
+subjects.forEach(sub => {
+
+let studyTime = Math.max(1, Math.round(
+(sub.difficulty * sub.weightage) / 10
+))
+
+if (remainingHours > 0) {
+
+dayPlan.push({
+subject: sub.name,
+hours: studyTime
+})
+
+remainingHours -= studyTime
+}
+
+})
+
+timetable.push({
+day: d + 1,
+plan: dayPlan
+})
+
+}
+
+res.json({
+daysLeft,
+timetable
+})
+
+})
+app.listen(PORT, () => {
+console.log("Server running on port", PORT)
 })
