@@ -217,8 +217,7 @@ data.push(p.recommendedHours)
 
 })
 
-const ctx = document.getElementById('progressChart')
-
+const ctx = document.getElementById('progressChart').getContext('2d')
 new Chart(ctx,{
 
 type:'bar',
@@ -327,20 +326,22 @@ fetch("/subjects/" + currentUser.username)
 .then(res => res.json())
 .then(subjects => {
 
-let examDate = document.getElementById("examDate").value
-let hours = document.getElementById("studyHours").value
+const examDate = document.getElementById("examDate").value
+const hoursPerDay = document.getElementById("studyHours").value
 
 fetch("/generate-timetable",{
 
 method:"POST",
 headers:{"Content-Type":"application/json"},
+
 body:JSON.stringify({
 subjects:subjects,
 examDate:examDate,
-hoursPerDay:hours
+hoursPerDay:hoursPerDay
 })
 
 })
+
 .then(res=>res.json())
 .then(data=>{
 
