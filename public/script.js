@@ -205,45 +205,37 @@ showChart(data.plan)
 })
 
 }
+let chart;
+
 function showChart(plan){
 
 let labels=[]
 let data=[]
 
 plan.forEach(p=>{
-
 labels.push(p.subject)
-data.push(p.recommendedHours)
-
+data.push(p.hours)
 })
 
 const ctx = document.getElementById('progressChart').getContext('2d')
-new Chart(ctx,{
 
-type:'bar',
-
-data:{
-
-labels:labels,
-
-datasets:[{
-
-label:'Recommended Study Hours',
-
-data:data,
-
-borderWidth:1
-
-}]
-
-},
-
-options:{
-
-responsive:true
-
+if(chart){
+chart.destroy()
 }
 
+chart = new Chart(ctx,{
+type:'bar',
+data:{
+labels:labels,
+datasets:[{
+label:'Study Hours',
+data:data,
+borderWidth:1
+}]
+},
+options:{
+responsive:true
+}
 })
 
 }
@@ -362,6 +354,8 @@ div.innerHTML+=p.subject+" - "+p.hours+"h <br>"
 result.appendChild(div)
 
 })
+
+showChart(data.timetable[0].plan)
 
 })
 
