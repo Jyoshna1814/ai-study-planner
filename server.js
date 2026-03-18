@@ -120,108 +120,86 @@ res.json({message:"Subject updated"})
 
 })
 // AI STUDY PLAN GENERATOR 
-app.post("/generate-plan",(req,res)=>{
+app.post("/generate-timetable", (req,res)=>{
 
-const {subjects, examDate, hours} = req.body
+const subjects = req.body.subjects
+const examDate = new Date(req.body.examDate)
+const hoursPerDay = Number(req.body.hoursPerDay)
 
 const today = new Date()
-const exam = new Date(examDate)
 
-const daysLeft = Math.ceil((exam - today)/(1000*60*60*24))
+const daysLeft = Math.ceil((examDate - today)/(1000*60*60*24))
 
-if(daysLeft <= 0){
-return res.json({message:"Exam date passed"})
+let timetable = []
+
+for(let i=1;i<=daysLeft;i++){
+
+let dailyPlan=[]
+
+subjects.forEach(sub=>{
+
+let hours = (hoursPerDay / subjects.length).toFixed(1)
+
+dailyPlan.push({
+subject:sub.name,
+hours:hours
+})
+
+})
+
+timetable.push({
+day:i,
+plan:dailyPlan
+})
+
 }
 
-let totalWeight = 0
-
-subjects.forEach(s=>{
-totalWeight += (s.difficulty * s.weightage)
-})
-
-let plan=[]
-
-subjects.forEach(s=>{
-
-let subjectWeight = (s.difficulty * s.weightage) / totalWeight
-
-let totalStudyHours = hours * daysLeft * subjectWeight
-
-plan.push({
-
-subject:s.name,
-difficulty:s.difficulty,
-weightage:s.weightage,
-recommendedHours: Math.round(totalStudyHours)
-
-})
-
-})
-
 res.json({
-
-daysLeft:daysLeft,
-plan:plan
-
+timetable:timetable
 })
 
 })
-
 app.get("/", (req,res)=>{
 res.sendFile(__dirname + "/public/index.html")
 })
 
 const PORT = process.env.PORT || 3000
+app.post("/generate-timetable", (req,res)=>{
 
-app.post("/generate-timetable", (req, res) => {
-
-const { subjects, examDate, hoursPerDay } = req.body
+const subjects = req.body.subjects
+const examDate = new Date(req.body.examDate)
+const hoursPerDay = Number(req.body.hoursPerDay)
 
 const today = new Date()
-const exam = new Date(examDate)
 
-const daysLeft = Math.ceil((exam - today) / (1000 * 60 * 60 * 24))
-
-if (daysLeft <= 0) {
-return res.json({ message: "Exam date already passed" })
-}
+const daysLeft = Math.ceil((examDate - today)/(1000*60*60*24))
 
 let timetable = []
 
-for (let d = 0; d < daysLeft; d++) {
+for(let i=1;i<=daysLeft;i++){
 
-let dayPlan = []
+let dailyPlan=[]
 
-let remainingHours = hoursPerDay
+subjects.forEach(sub=>{
 
-subjects.forEach(sub => {
+let hours = (hoursPerDay / subjects.length).toFixed(1)
 
-let studyTime = Math.max(1, Math.round(
-(sub.difficulty * sub.weightage) / 10
-))
-
-if (remainingHours > 0) {
-
-dayPlan.push({
-subject: sub.name,
-hours: studyTime
+dailyPlan.push({
+subject:sub.name,
+hours:hours
 })
-
-remainingHours -= studyTime
-}
 
 })
 
 timetable.push({
-day: d + 1,
-plan: dayPlan
+day:i,
+plan:dailyPlan
 })
 
 }
 
 res.json({
-daysLeft,
-timetable
+timetable:timetable
 })
 
 })
