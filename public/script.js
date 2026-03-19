@@ -337,6 +337,8 @@ hoursPerDay:hoursPerDay
 .then(res=>res.json())
 .then(data=>{
 
+ console.log(data)   
+
 let result = document.getElementById("planResult")
 
 result.innerHTML=""
