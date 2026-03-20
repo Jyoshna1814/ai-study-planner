@@ -24,6 +24,8 @@ console.log(err)
 const UserSchema = new mongoose.Schema({
 username:String,
 password:String
+difficulty: Number,
+weightage: Number
 })
 
 const User = mongoose.model("User", UserSchema)
@@ -32,6 +34,8 @@ const User = mongoose.model("User", UserSchema)
 const SubjectSchema = new mongoose.Schema({
 user:String,
 name:String
+difficulty: Number,
+weightage: Number
 })
 
 const Subject = mongoose.model("Subject",SubjectSchema)
@@ -158,11 +162,6 @@ timetable:timetable
 })
 
 })
-app.get("/", (req,res)=>{
-res.sendFile(__dirname + "/public/index.html")
-})
-
-const PORT = process.env.PORT || 3000
 app.post("/generate-timetable", (req, res) => {
 
     const { subjects, examDate, hoursPerDay } = req.body
@@ -172,7 +171,9 @@ app.post("/generate-timetable", (req, res) => {
 
     const daysLeft = Math.ceil((exam - today) / (1000 * 60 * 60 * 24))
 
-    // STEP 1: Calculate total score
+    let timetable = []
+
+    // STEP 1: Calculate score
     let totalScore = 0
 
     subjects.forEach(s => {
@@ -180,22 +181,32 @@ app.post("/generate-timetable", (req, res) => {
         totalScore += s.score
     })
 
-    let timetable = []
-
-    // STEP 2: Generate timetable
+    // STEP 2: Generate dynamic plan
     for (let d = 1; d <= daysLeft; d++) {
 
         let dayPlan = []
 
         subjects.forEach(s => {
 
-            let hours = (s.score / totalScore) * hoursPerDay
+            // 🔥 PRIORITY BOOST (closer to exam → more focus)
+            let urgencyFactor = 1 + (d / daysLeft)
+
+            // 🔥 REVISION MODE (last 30% days)
+            let revisionBoost = d > daysLeft * 0.7 ? 1.5 : 1
+
+            // 🔥 FINAL SCORE
+            let adjustedScore = s.score * urgencyFactor * revisionBoost
+
+            let hours = (adjustedScore / totalScore) * hoursPerDay
 
             dayPlan.push({
                 subject: s.name,
                 hours: hours.toFixed(2)
             })
         })
+
+        // 🔥 SORT: Hardest first
+        dayPlan.sort((a, b) => b.hours - a.hours)
 
         timetable.push({
             day: d,
@@ -207,8 +218,53 @@ app.post("/generate-timetable", (req, res) => {
         daysLeft,
         timetable
     })
-
 })
 app.listen(PORT, () => {
 console.log("Server running on port", PORT)
 })
+const express = require("express");
+const cors = require("cors");
+const mongoose = require("mongoose");
+
+const axios = require("axios");
+
+app.post("/ai-plan", async (req, res) => {
+    const { subjects, examDate, hoursPerDay } = req.body;
+
+    const prompt = `
+Create a highly optimized study plan.
+
+Subjects: ${JSON.stringify(subjects)}
+Exam Date: ${examDate}
+Daily Available Hours: ${hoursPerDay}
+
+Rules:
+1. Hard subjects should get more time.
+2. Subjects with high weightage should appear earlier.
+3. Include revision slots.
+4. Format result in clean HTML.
+5. Show Day 1, Day 2, Day 3... until exam date.
+`;
+
+    try {
+        const result = await axios.post(
+            "https://api.openai.com/v1/chat/completions",
+            {
+                model: "gpt-4o-mini",
+                messages: [{ role: "user", content: prompt }],
+            },
+            {
+                headers: {
+                    "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+                    "Content-Type": "application/json"
+                }
+            }
+        );
+
+        res.json({ plan: result.data.choices[0].message.content });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "AI generation failed." });
+    }
+});
