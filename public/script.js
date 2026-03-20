@@ -327,7 +327,11 @@ method:"POST",
 headers:{"Content-Type":"application/json"},
 
 body:JSON.stringify({
-subjects:subjects,
+subjects: subjects.map(s => ({
+    name: s.name,
+    difficulty: s.difficulty || 1,
+    weightage: s.weightage || 1
+})),
 examDate:examDate,
 hoursPerDay:hoursPerDay
 })

@@ -164,43 +164,50 @@ res.sendFile(__dirname + "/public/index.html")
 })
 
 const PORT = process.env.PORT || 3000
-app.post("/generate-timetable", (req,res)=>{
+app.post("/generate-timetable", (req, res) => {
 
-const subjects = req.body.subjects
-const examDate = new Date(req.body.examDate)
-const hoursPerDay = Number(req.body.hoursPerDay)
+    const { subjects, examDate, hoursPerDay } = req.body
 
-const today = new Date()
+    const today = new Date()
+    const exam = new Date(examDate)
 
-const daysLeft = Math.ceil((examDate - today)/(1000*60*60*24))
+    const daysLeft = Math.ceil((exam - today) / (1000 * 60 * 60 * 24))
 
-let timetable = []
+    // STEP 1: Calculate total score
+    let totalScore = 0
 
-for(let i=1;i<=daysLeft;i++){
+    subjects.forEach(s => {
+        s.score = (s.difficulty || 1) * (s.weightage || 1)
+        totalScore += s.score
+    })
 
-let dailyPlan=[]
+    let timetable = []
 
-subjects.forEach(sub=>{
+    // STEP 2: Generate timetable
+    for (let d = 1; d <= daysLeft; d++) {
 
-let hours = (hoursPerDay / subjects.length).toFixed(1)
+        let dayPlan = []
 
-dailyPlan.push({
-subject:sub.name,
-hours:hours
-})
+        subjects.forEach(s => {
 
-})
+            let hours = (s.score / totalScore) * hoursPerDay
 
-timetable.push({
-day:i,
-plan:dailyPlan
-})
+            dayPlan.push({
+                subject: s.name,
+                hours: hours.toFixed(2)
+            })
+        })
 
-}
+        timetable.push({
+            day: d,
+            plan: dayPlan
+        })
+    }
 
-res.json({
-timetable:timetable
-})
+    res.json({
+        daysLeft,
+        timetable
+    })
 
 })
 app.listen(PORT, () => {
