@@ -76,15 +76,14 @@ res.json({message:"Login successful",user})
 // ADD SUBJECT
 app.post("/add-subject", async (req,res)=>{
 
-const {user,subject} = req.body
+const { user, name, difficulty, weightage } = req.body
 
 const newSubject = new Subject({
-
-user:user,
-name:subject
-
+    user,
+    name,
+    difficulty,
+    weightage
 })
-
 await newSubject.save()
 
 res.json({message:"Subject added"})

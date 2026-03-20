@@ -60,23 +60,20 @@ alert("Login failed")
 
 function addSubject(){
 
-let subject=document.getElementById("subjectInput").value
+let subject = document.getElementById("subjectInput").value
+let difficulty = document.getElementById("difficultyInput").value
+let weightage = document.getElementById("weightageInput").value
 
 fetch("/add-subject",{
-
 method:"POST",
-
 headers:{"Content-Type":"application/json"},
-
 body:JSON.stringify({
-
-user:currentUser.username,
-subject:subject
-
+user: currentUser.username,
+name: subject,
+difficulty: Number(difficulty),
+weightage: Number(weightage)
 })
-
 })
-
 .then(res=>res.json())
 
 .then(data=>{
