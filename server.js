@@ -123,7 +123,6 @@ res.json({message:"Subject updated"})
 
 })
 // AI STUDY PLAN GENERATOR 
-app.post("/generate-timetable", (req,res)=>{
 
 const subjects = req.body.subjects
 const examDate = new Date(req.body.examDate)
@@ -161,7 +160,6 @@ res.json({
 timetable:timetable
 })
 
-})
 app.post("/generate-timetable", (req, res) => {
 
     const { subjects, examDate, hoursPerDay } = req.body
@@ -219,12 +217,6 @@ app.post("/generate-timetable", (req, res) => {
         timetable
     })
 })
-app.listen(PORT, () => {
-console.log("Server running on port", PORT)
-})
-const express = require("express");
-const cors = require("cors");
-const mongoose = require("mongoose");
 
 const axios = require("axios");
 
@@ -268,3 +260,7 @@ Rules:
         res.status(500).json({ error: "AI generation failed." });
     }
 });
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+console.log("Server running on port", PORT)
+})
