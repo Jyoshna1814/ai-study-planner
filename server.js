@@ -23,7 +23,7 @@ console.log(err)
 
 const UserSchema = new mongoose.Schema({
 username:String,
-password:String
+password:String,
 difficulty: Number,
 weightage: Number
 })
@@ -33,7 +33,7 @@ const User = mongoose.model("User", UserSchema)
 // SUBJECT SCHEMA
 const SubjectSchema = new mongoose.Schema({
 user:String,
-name:String
+name:String,
 difficulty: Number,
 weightage: Number
 })
