@@ -1,189 +1,101 @@
 const express = require("express")
 const cors = require("cors")
 const mongoose = require("mongoose")
-const axios = require("axios")
 
 const app = express()
-const PORT = process.env.PORT || 5000
-
 app.use(cors())
 app.use(express.json())
-app.use(express.static("public"))
 
-// DB CONNECT
-mongoose.connect("mongodb+srv://jyoshna:sasmal1814@cluster0.0fnvv0m.mongodb.net/studyplanner")
-.then(() => console.log("MongoDB connected"))
-.catch(err => console.log(err))
+mongoose.connect("YOUR_MONGO_URL")
 
-// USER SCHEMA
-const UserSchema = new mongoose.Schema({
-  username: String,
-  password: String,
-  difficulty: Number,
-  weightage: Number
-})
-
-const User = mongoose.model("User", UserSchema)
-
-// SUBJECT SCHEMA
+// Schemas
 const SubjectSchema = new mongoose.Schema({
   user: String,
   name: String,
   difficulty: Number,
-  weightage: Number
+  weightage: Number,
+  completedHours: { type: Number, default: 0 }
 })
 
 const Subject = mongoose.model("Subject", SubjectSchema)
 
-// SIGNUP
-app.post("/signup", async (req, res) => {
-  const { username, password } = req.body
-
-  const existingUser = await User.findOne({ username })
-  if (existingUser) {
-    return res.json({ message: "User already exists" })
-  }
-
-  const newUser = new User({ username, password })
-  await newUser.save()
-
-  res.json({ message: "Signup successful" })
-})
-
-// LOGIN
-app.post("/login", async (req, res) => {
-  const { username, password } = req.body
-
-  const user = await User.findOne({ username, password })
-  if (!user) {
-    return res.json({ message: "Invalid login" })
-  }
-
-  res.json({ message: "Login successful", user })
-})
-
-// ADD SUBJECT
-app.post("/add-subject", async (req, res) => {
-  const { user, name, difficulty, weightage } = req.body
-
-  const newSubject = new Subject({
-    user,
-    name,
-    difficulty,
-    weightage
-  })
-
-  await newSubject.save()
-  res.json({ message: "Subject added" })
-})
-
-// GET SUBJECTS
-app.get("/subjects/:user", async (req, res) => {
-  const subjects = await Subject.find({ user: req.params.user })
-  res.json(subjects)
-})
-
-// DELETE SUBJECT
-app.delete("/delete-subject/:id", async (req, res) => {
-  await Subject.findByIdAndDelete(req.params.id)
-  res.json({ message: "Subject deleted" })
-})
-
-// EDIT SUBJECT
-app.put("/edit-subject/:id", async (req, res) => {
-  await Subject.findByIdAndUpdate(req.params.id, {
-    name: req.body.name
-  })
-  res.json({ message: "Subject updated" })
-})
-
-// SMART TIMETABLE (KEEP ONLY THIS ONE)
-app.post("/generate-timetable", (req, res) => {
+// Generate Smart Timetable
+app.post("/generate-timetable", async (req, res) => {
   const { subjects, examDate, hoursPerDay } = req.body
 
   const today = new Date()
   const exam = new Date(examDate)
-
-  const daysLeft = Math.ceil((exam - today) / (1000 * 60 * 60 * 24))
+  const daysLeft = Math.max(1, Math.ceil((exam - today)/(1000*60*60*24)))
 
   let timetable = []
-  let totalScore = 0
 
+  // base score
   subjects.forEach(s => {
-    s.score = (s.difficulty || 1) * (s.weightage || 1)
-    totalScore += s.score
+    s.baseScore = (s.weightage * 0.7) + (s.difficulty * 0.3)
   })
 
   for (let d = 1; d <= daysLeft; d++) {
     let dayPlan = []
+    let dailyTotal = 0
 
     subjects.forEach(s => {
-      let urgencyFactor = 1 + (d / daysLeft)
-      let revisionBoost = d > daysLeft * 0.7 ? 1.5 : 1
+      let urgency = 1 + (d / daysLeft)
+      let revision = d > daysLeft * 0.7 ? 1.5 : 1
 
-      let adjustedScore = s.score * urgencyFactor * revisionBoost
-      let hours = (adjustedScore / totalScore) * hoursPerDay
+      s.adjusted = s.baseScore * urgency * revision
+
+      // weak subject boost
+      if (s.difficulty >= 4) s.adjusted *= 1.2
+
+      dailyTotal += s.adjusted
+    })
+
+    subjects.forEach(s => {
+      let hours = (s.adjusted / dailyTotal) * hoursPerDay
+
+      // cap
+      if (hours > 3) hours = 3
 
       dayPlan.push({
         subject: s.name,
-        hours: hours.toFixed(2)
+        hours: Number(hours.toFixed(2))
       })
     })
 
-    dayPlan.sort((a, b) => b.hours - a.hours)
-
-    timetable.push({
-      day: d,
-      plan: dayPlan
-    })
+    timetable.push({ day: d, plan: dayPlan })
   }
 
   res.json({ daysLeft, timetable })
 })
 
-// AI PLAN
-app.post("/ai-plan", async (req, res) => {
-  const { subjects, examDate, hoursPerDay } = req.body
+// Track Progress
+app.post("/update-progress", async (req, res) => {
+  const { subjectName, hours } = req.body
 
-  const prompt = `
-Create a highly optimized study plan.
+  const subject = await Subject.findOne({ name: subjectName })
+  subject.completedHours += hours
+  await subject.save()
 
-Subjects: ${JSON.stringify(subjects)}
-Exam Date: ${examDate}
-Daily Available Hours: ${hoursPerDay}
-
-Rules:
-1. Hard subjects should get more time.
-2. Subjects with high weightage should appear earlier.
-3. Include revision slots.
-4. Format result in clean HTML.
-5. Show Day 1, Day 2, Day 3... until exam date.
-`
-
-  try {
-    const result = await axios.post(
-      "https://api.openai.com/v1/chat/completions",
-      {
-        model: "gpt-4o-mini",
-        messages: [{ role: "user", content: prompt }],
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-          "Content-Type": "application/json"
-        }
-      }
-    )
-
-    res.json({ plan: result.data.choices[0].message.content })
-
-  } catch (err) {
-    console.error(err)
-    res.status(500).json({ error: "AI generation failed." })
-  }
+  res.json({ message: "Progress updated" })
 })
 
-// START SERVER (ALWAYS LAST)
-app.listen(PORT, () => {
-  console.log("Server running on port", PORT)
+// Get Progress
+app.get("/progress/:user", async (req, res) => {
+  const subjects = await Subject.find({ user: req.params.user })
+
+  let totalAssigned = 0
+  let totalCompleted = 0
+
+  subjects.forEach(s => {
+    totalAssigned += (s.weightage * s.difficulty)
+    totalCompleted += s.completedHours
+  })
+
+  let progress = (totalCompleted / totalAssigned) * 100
+
+  res.json({ progress: progress.toFixed(2), subjects })
 })
+
+app.listen(5000, ()=>console.log("Server running"))
+
+
