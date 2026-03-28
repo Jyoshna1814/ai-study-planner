@@ -1,15 +1,104 @@
+let currentUser = null
+let chart;
+
+// ================= AUTH =================
+function signup(){
+let username = document.getElementById("username").value
+let password = document.getElementById("password").value
+
+fetch("/signup",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({username,password})
+})
+.then(res=>res.json())
+.then(data=> alert(data.message))
+}
+
+function login(){
+let username = document.getElementById("username").value
+let password = document.getElementById("password").value
+
+fetch("/login",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({username,password})
+})
+.then(res=>res.json())
+.then(data=>{
+if(data.message=="Login successful"){
+currentUser=data.user
+localStorage.setItem("user", JSON.stringify(currentUser))
+
+document.getElementById("authBox").style.display="none"
+document.getElementById("logoutBtn").style.display="block"
+
+loadSubjects()
+loadProgress()
+}
+else alert("Login failed")
+})
+}
+
+function logout(){
+localStorage.removeItem("user")
+location.reload()
+}
+
+// ================= SUBJECT =================
+function addSubject(){
+let subject = document.getElementById("subjectInput").value
+let difficulty = document.getElementById("difficultyInput").value
+let weightage = document.getElementById("weightageInput").value
+
+fetch("/add-subject",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+user: currentUser.username,
+name: subject,
+difficulty: Number(difficulty),
+weightage: Number(weightage)
+})
+})
+.then(()=> loadSubjects())
+}
+
+function loadSubjects(){
+fetch("/subjects/"+currentUser.username)
+.then(res=>res.json())
+.then(data=>{
+let list=document.getElementById("subjectList")
+list.innerHTML=""
+
+data.forEach(sub=>{
+let li=document.createElement("li")
+li.innerHTML = sub.name
+list.appendChild(li)
+})
+})
+}
+
+// ================= TIMETABLE =================
 async function generateTimetable(){
 
 const res = await fetch("/subjects/" + currentUser.username)
-const subjects = await res.json()
+let subjects = await res.json()
+
+// 🔥 apply missed recovery
+subjects.forEach(s=>{
+if(s.completedHours < 2){
+s.difficulty += 1
+}
+})
 
 const examDate = document.getElementById("examDate").value
 const hoursPerDay = document.getElementById("studyHours").value
 
 const response = await fetch("/generate-timetable",{
-  method:"POST",
-  headers:{"Content-Type":"application/json"},
-  body:JSON.stringify({subjects, examDate, hoursPerDay})
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({subjects, examDate, hoursPerDay})
 })
 
 const data = await response.json()
@@ -18,63 +107,121 @@ let result = document.getElementById("planResult")
 result.innerHTML=""
 
 data.timetable.forEach(day=>{
-  let div = document.createElement("div")
-  div.innerHTML = `<h3>Day ${day.day}</h3>`
+let div = document.createElement("div")
+div.innerHTML = `<h3>Day ${day.day}</h3>`
 
-  day.plan.forEach(p=>{
-    div.innerHTML += `${p.subject} - ${p.hours}h <button onclick="markDone('${p.subject}',${p.hours})">Done</button><br>`
-  })
+day.plan.forEach(p=>{
+div.innerHTML += `${p.subject} - ${p.hours}h 
+<button onclick="markDone('${p.subject}',${p.hours})">Done</button><br>`
+})
 
-  result.appendChild(div)
+result.appendChild(div)
 })
 
 showChart(data.timetable[data.timetable.length-1].plan)
 }
 
-// Progress update
+// ================= PROGRESS =================
 async function markDone(subject, hours){
 
 await fetch("/update-progress",{
-  method:"POST",
-  headers:{"Content-Type":"application/json"},
-  body:JSON.stringify({subjectName:subject, hours})
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+subjectName:subject,
+hours,
+user: currentUser.username
+})
 })
 
 loadProgress()
 }
 
-// Load progress bar
 async function loadProgress(){
 
 const res = await fetch("/progress/" + currentUser.username)
 const data = await res.json()
 
 let bar = document.getElementById("progressBar")
+
 bar.style.width = data.progress + "%"
 bar.innerText = data.progress + "%"
 }
 
-// Chart
+// ================= CHART =================
 function showChart(plan){
+
 let labels = plan.map(p=>p.subject)
 let values = plan.map(p=>p.hours)
 
 const ctx = document.getElementById("progressChart").getContext("2d")
 
-new Chart(ctx,{
-  type:'bar',
-  data:{labels:labels,datasets:[{label:'Hours',data:values}]}
+if(chart){
+chart.destroy()
+}
+
+chart = new Chart(ctx,{
+type:'bar',
+data:{
+labels:labels,
+datasets:[{
+label:'Study Hours',
+data:values
+}]
+}
 })
 }
 
+// ================= TIMER =================
+let timer
+let timeLeft = 25 * 60
 
-// ================= EXTRA FEATURE =================
-// Missed target recovery
+function updateTimer(){
+let minutes = Math.floor(timeLeft / 60)
+let seconds = timeLeft % 60
 
-function recoverMissed(subjects){
-  subjects.forEach(s=>{
-    if(s.completedHours < 2){
-      s.difficulty += 1 // increase priority
-    }
-  })
+document.getElementById("timer").textContent =
+minutes.toString().padStart(2,"0") + ":" +
+seconds.toString().padStart(2,"0")
+}
+
+function startTimer(){
+if(timer) return
+timer = setInterval(()=>{
+timeLeft--
+updateTimer()
+if(timeLeft <= 0){
+clearInterval(timer)
+timer=null
+alert("Session complete!")
+}
+},1000)
+}
+
+function stopTimer(){
+clearInterval(timer)
+timer=null
+}
+
+function resetTimer(){
+clearInterval(timer)
+timer=null
+timeLeft = 25 * 60
+updateTimer()
+}
+
+updateTimer()
+
+// ================= AUTO LOGIN =================
+window.onload = function(){
+let savedUser = localStorage.getItem("user")
+
+if(savedUser){
+currentUser = JSON.parse(savedUser)
+document.getElementById("authBox").style.display="none"
+document.getElementById("logoutBtn").style.display="block"
+
+loadSubjects()
+loadProgress()
+}
 }
