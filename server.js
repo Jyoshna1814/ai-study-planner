@@ -47,8 +47,10 @@ app.post("/generate-timetable", async (req, res) => {
 
       s.completedHours = s.completedHours || 0
 
-      s.baseScore = (s.weightage * 0.6) + (s.difficulty * 0.4)
+      const weight = Number(s.weightage) || 1
+      const diff = Number(s.difficulty) || 1
 
+      s.baseScore = (weight * 0.6) + (diff * 0.4)
       // 🔥 Missed target boost
       if (s.completedHours < 2) {
         s.baseScore *= 1.3

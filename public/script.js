@@ -84,6 +84,12 @@ async function generateTimetable(){
 
 const res = await fetch("/subjects/" + currentUser.username)
 let subjects = await res.json()
+subjects = subjects.map(s => ({
+  name: s.name,
+  difficulty: Number(s.difficulty) || 1,
+  weightage: Number(s.weightage) || 1,
+  completedHours: s.completedHours || 0
+}))
 
 // 🔥 apply missed recovery
 subjects.forEach(s=>{
