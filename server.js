@@ -101,7 +101,11 @@ app.post("/generate-timetable", async (req, res) => {
     res.status(500).json({ error: "Timetable generation failed" })
   }
 })
-
+// GET SUBJECTS (ADD THIS)
+app.get("/subjects/:user", async (req, res) => {
+  const subjects = await Subject.find({ user: req.params.user })
+  res.json(subjects)
+})
 
 // ================= UPDATE PROGRESS =================
 app.post("/update-progress", async (req, res) => {
@@ -135,6 +139,10 @@ app.get("/progress/:user", async (req, res) => {
   try {
 
     const subjects = await Subject.find({ user: req.params.user })
+  
+    if (!subjects || subjects.length === 0) {
+      return res.json({ progress: 0, subjects: [] })
+    }
 
     let totalAssigned = 0
     let totalCompleted = 0
