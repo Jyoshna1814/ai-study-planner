@@ -79,11 +79,19 @@ app.post("/generate-timetable", async (req, res) => {
 
       subjects.forEach(s => {
 
-       let hours = 0
+        let hours = 0
 
-       if(totalScore > 0){
-       hours = (s.adjusted / totalScore) * hoursPerDay
-      }
+        if(totalScore > 0){
+          hours = (s.adjusted / totalScore) * hoursPerDay
+        }
+
+        dayPlan.push({
+          subject: s.name,
+          hours: hours
+        })
+
+      })
+
       // sort by priority
       dayPlan.sort((a,b)=> b.hours - a.hours)
 
@@ -100,6 +108,7 @@ app.post("/generate-timetable", async (req, res) => {
     res.status(500).json({ error: "Timetable generation failed" })
   }
 })
+
 // GET SUBJECTS (ADD THIS)
 app.get("/subjects/:user", async (req, res) => {
   const subjects = await Subject.find({ user: req.params.user })
