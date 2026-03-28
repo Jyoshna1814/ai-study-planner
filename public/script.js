@@ -137,7 +137,7 @@ div.innerHTML = `<h3>Day ${day.day}</h3>`
 
 day.plan.forEach(p=>{
 div.innerHTML += `${p.subject} - ${p.hours}h 
-<button onclick="markDone('${p.subject}',${p.hours})">Done</button><br>`
+<button onclick="markDone('${p.id}',${p.hours})">Done</button>`
 })
 
 result.appendChild(div)
@@ -153,21 +153,13 @@ await fetch("/update-progress",{
 method:"POST",
 headers:{"Content-Type":"application/json"},
 body:JSON.stringify({
-  subjectName: subject,
-  hours: Number(hours),
-  user: currentUser.username
+  subject: subject,
+  hours: Number(hours)
 })
 })
 
-// 🔥 UI CHANGE
-alert("✅ Task Completed")
-
-// 🔥 Reload progress bar
+alert("✅ Done marked")
 loadProgress()
-
-// 🔥 OPTIONAL: button disable
-event.target.disabled = true
-event.target.innerText = "Done ✔"
 }
 async function loadProgress(){
 

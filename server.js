@@ -95,6 +95,7 @@ app.post("/generate-timetable", async (req, res) => {
         }
 
         dayPlan.push({
+          id: s._id,  
           subject: s.name,
           hours: Number(hours.toFixed(2))
         })
@@ -123,17 +124,24 @@ app.get("/subjects/:user", async (req, res) => {
   const subjects = await Subject.find({ user: req.params.user })
   res.json(subjects)
 })
+// DELETE SUBJECT
+app.delete("/delete-subject/:id", async (req, res) => {
+  try {
+    await Subject.findByIdAndDelete(req.params.id)
+    res.json({ message: "Deleted" })
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ error: "Delete failed" })
+  }
+})
 
 // ================= UPDATE PROGRESS =================
 app.post("/update-progress", async (req, res) => {
   try {
 
-    const { subjectName, hours, user } = req.body
+    const { subjectId, hours } = req.body
 
-    const subject = await Subject.findOne({
-      name: subjectName,
-      user: user
-    })
+    const subject = await Subject.findById(subjectId)
 
     if (!subject) {
       return res.json({ message: "Subject not found" })
