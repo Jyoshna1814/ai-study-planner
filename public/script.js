@@ -93,8 +93,7 @@ s.difficulty += 1
 })
 
 const examDate = document.getElementById("examDate").value
-const hoursPerDay = document.getElementById("studyHours").value
-
+const hoursPerDay = Number(document.getElementById("studyHours").value)
 const response = await fetch("/generate-timetable",{
 method:"POST",
 headers:{"Content-Type":"application/json"},
@@ -128,15 +127,14 @@ await fetch("/update-progress",{
 method:"POST",
 headers:{"Content-Type":"application/json"},
 body:JSON.stringify({
-subjectName:subject,
-hours,
-user: currentUser.username
+  subjectName: subject,
+  hours: Number(hours),
+  user: currentUser.username
 })
 })
-
+alert("Done marked ✅")
 loadProgress()
 }
-
 async function loadProgress(){
 
 const res = await fetch("/progress/" + currentUser.username)

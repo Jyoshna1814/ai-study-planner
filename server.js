@@ -8,7 +8,6 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 app.use(express.static(path.join(__dirname, "public")))
-
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"))
 })
@@ -80,18 +79,11 @@ app.post("/generate-timetable", async (req, res) => {
 
       subjects.forEach(s => {
 
-        let hours = (s.adjusted / totalScore) * hoursPerDay
+       let hours = 0
 
-        // cap max hours per subject
-        if (hours > 3) hours = 3
-
-        dayPlan.push({
-          subject: s.name,
-          hours: Number(hours.toFixed(2))
-        })
-
-      })
-
+       if(totalScore > 0){
+       hours = (s.adjusted / totalScore) * hoursPerDay
+      }
       // sort by priority
       dayPlan.sort((a,b)=> b.hours - a.hours)
 
