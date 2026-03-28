@@ -45,19 +45,21 @@ app.post("/generate-timetable", async (req, res) => {
     // 🔥 STEP 1: Calculate base score
     subjects.forEach(s => {
 
-      s.completedHours = s.completedHours || 0
+  s.completedHours = s.completedHours || 0
 
-      const weight = Number(s.weightage) || 1
-      const diff = Number(s.difficulty) || 1
+  const weight = Number(s.weightage) || 1
+  const diff = Number(s.difficulty) || 1
 
-      s.baseScore = (weight * 0.6) + (diff * 0.4)
-      // 🔥 Missed target boost
-      if (s.completedHours < 2) {
-        s.baseScore *= 1.3
-      }
+  // 🔥 STRONG PRIORITY LOGIC
+  s.baseScore = (weight * weight) * 0.7 + (diff * diff) * 0.3
 
-    })
+  // 🔥 weak subject boost
+  if (diff >= 4) s.baseScore *= 1.5
 
+  // 🔥 missed target boost
+  if (s.completedHours < 2) s.baseScore *= 1.4
+
+})
     // ================= DAILY PLAN =================
     for (let d = 1; d <= daysLeft; d++) {
 
@@ -89,7 +91,7 @@ app.post("/generate-timetable", async (req, res) => {
 
         dayPlan.push({
           subject: s.name,
-          hours: hours
+          hours: Number(hours.toFixed(2))
         })
 
       })

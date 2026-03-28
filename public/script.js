@@ -73,10 +73,30 @@ list.innerHTML=""
 
 data.forEach(sub=>{
 let li=document.createElement("li")
-li.innerHTML = sub.name
+
+li.innerHTML = `
+${sub.name} 
+<button onclick="editSubject('${sub._id}','${sub.name}')">Edit</button>
+<button onclick="deleteSubject('${sub._id}')">Delete</button>
+`
 list.appendChild(li)
 })
 })
+}
+function deleteSubject(id){
+fetch("/delete-subject/" + id, { method: "DELETE" })
+.then(()=> loadSubjects())
+}
+
+function editSubject(id,name){
+let newName = prompt("Edit subject", name)
+
+fetch("/edit-subject/" + id, {
+method:"PUT",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({ name:newName })
+})
+.then(()=> loadSubjects())
 }
 
 // ================= TIMETABLE =================
