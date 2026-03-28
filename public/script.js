@@ -158,8 +158,16 @@ body:JSON.stringify({
   user: currentUser.username
 })
 })
-alert("Done marked ✅")
+
+// 🔥 UI CHANGE
+alert("✅ Task Completed")
+
+// 🔥 Reload progress bar
 loadProgress()
+
+// 🔥 OPTIONAL: button disable
+event.target.disabled = true
+event.target.innerText = "Done ✔"
 }
 async function loadProgress(){
 

@@ -68,19 +68,24 @@ app.post("/generate-timetable", async (req, res) => {
 
       subjects.forEach(s => {
 
-        let urgency = 1 + (d / daysLeft)
-        let revision = d > daysLeft * 0.7 ? 1.5 : 1
+  const weight = Number(s.weightage) || 1
+  const diff = Number(s.difficulty) || 1
 
-        let adjusted = s.baseScore * urgency * revision
+  let urgency = 1 + (d / daysLeft)
 
-        // weak subject boost
-        if (s.difficulty >= 4) adjusted *= 1.2
+  // 🔥 SUBJECT BASED DIFFERENCE
+  let subjectFactor = (weight * 0.7) + (diff * 0.3)
 
-        s.adjusted = adjusted
-        totalScore += adjusted
+  let revision = d > daysLeft * 0.7 ? 1.5 : 1
 
-      })
+  let adjusted = s.baseScore * urgency * revision * subjectFactor
 
+  // 🔥 EXTRA BOOST
+  if(diff >= 4) adjusted *= 1.3
+
+  s.adjusted = adjusted
+  totalScore += adjusted
+})
       subjects.forEach(s => {
 
         let hours = 0
