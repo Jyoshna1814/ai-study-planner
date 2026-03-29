@@ -108,29 +108,15 @@ body:JSON.stringify({ name:newName })
 async function generateTimetable(){
 
 const res = await fetch("/subjects/" + currentUser.username)
-let subjects = await res.json()
-subjects = subjects.map(s => ({
-  name: s.name,
-  difficulty: Number(s.difficulty) || 1,
-  weightage: Number(s.weightage) || 1,
-  completedHours: s.completedHours || 0
-}))
+const subjects = await res.json()
 
-// 🔥 apply missed recovery
-subjects.forEach(s=>{
-if(s.completedHours < 2){
-s.difficulty += 1
-}
-})
-// 🔥 FETCH REAL SUBJECTS FROM DB
-const dbSubjects = await Subject.find({ user: subjects[0]?.user })
-subjects = dbSubjects
 const examDate = document.getElementById("examDate").value
 const hoursPerDay = Number(document.getElementById("studyHours").value)
+
 const response = await fetch("/generate-timetable",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({subjects, examDate, hoursPerDay})
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({subjects, examDate, hoursPerDay})
 })
 
 const data = await response.json()
@@ -139,35 +125,32 @@ let result = document.getElementById("planResult")
 result.innerHTML=""
 
 data.timetable.forEach(day=>{
-let div = document.createElement("div")
-div.innerHTML = `<h3>Day ${day.day}</h3>`
+  let div = document.createElement("div")
+  div.innerHTML = `<h3>Day ${day.day}</h3>`
 
-day.plan.forEach(p=>{
-div.innerHTML += `${p.subject} - ${p.hours}h 
-<button onclick="markDone('${p.id}',${p.hours})">Done</button>`
-})
+  day.plan.forEach(p=>{
+    div.innerHTML += `${p.subject} - ${p.hours.toFixed(2)}h 
+    <button onclick="markDone('${p.subject}',${p.hours})">Done</button><br>`
+  })
 
-result.appendChild(div)
+  result.appendChild(div)
 })
 
 showChart(data.timetable[data.timetable.length-1].plan)
 }
-
 // ================= PROGRESS =================
-async function markDone(id, hours){
-
-console.log("Sending ID:", id) 
+async function markDone(subject, hours){
 
 await fetch("/update-progress",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({
-  subjectId: id,
-  hours: Number(hours)
-})
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({
+    subjectName:subject,
+    hours: Number(hours),
+    user: currentUser.username  
+  })
 })
 
-alert("✅ Done marked")
 loadProgress()
 }
 async function loadProgress(){
