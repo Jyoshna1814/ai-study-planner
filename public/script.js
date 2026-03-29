@@ -124,13 +124,16 @@ const data = await response.json()
 let result = document.getElementById("planResult")
 result.innerHTML=""
 
+// 🔥 FIXED LOOP
 data.timetable.forEach(day=>{
   let div = document.createElement("div")
   div.innerHTML = `<h3>Day ${day.day}</h3>`
 
   day.plan.forEach(p=>{
-    div.innerHTML += `${p.subject} - ${p.hours.toFixed(2)}h 
-    <button onclick="markDone('${p.subject}',${p.hours})">Done</button><br>`
+    div.innerHTML += `
+      ${p.subject} - ${p.hours.toFixed(2)}h
+      <button onclick="markDone('${p.subject}', ${p.hours})">Done</button><br>
+    `
   })
 
   result.appendChild(div)
@@ -146,12 +149,16 @@ await fetch("/update-progress",{
   headers:{"Content-Type":"application/json"},
   body:JSON.stringify({
     subjectName:subject,
-    hours: Number(hours),
-    user: currentUser.username  
+    hours:Number(hours),
+    user: currentUser.username
   })
 })
 
-loadProgress()
+// 🔥 STEP A: reload progress bar
+await loadProgress()
+
+// 🔥 STEP B: RE-GENERATE timetable automatically
+await generateTimetable()
 }
 async function loadProgress(){
 
