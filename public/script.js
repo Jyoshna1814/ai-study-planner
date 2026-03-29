@@ -16,6 +16,7 @@ body:JSON.stringify({username,password})
 }
 
 function login(){
+
 let username = document.getElementById("username").value
 let password = document.getElementById("password").value
 
@@ -26,20 +27,30 @@ body:JSON.stringify({username,password})
 })
 .then(res=>res.json())
 .then(data=>{
-if(data.message=="Login successful"){
-currentUser=data.user
+
+// ✅ SUCCESS CHECK FIX
+if(data.user){
+
+currentUser = data.user
+
+// ✅ SAVE LOGIN
 localStorage.setItem("user", JSON.stringify(currentUser))
 
+// ✅ UI CHANGE
 document.getElementById("authBox").style.display="none"
 document.getElementById("logoutBtn").style.display="block"
 
+// ✅ STEP 4 (IMPORTANT)
 loadSubjects()
 loadProgress()
+
 }
-else alert("Login failed")
-})
+else{
+alert(data.message || "Login failed ❌")
 }
 
+})
+}
 function logout(){
 localStorage.removeItem("user")
 location.reload()

@@ -18,6 +18,7 @@ mongoose.connect(process.env.MONGO_URI)
 .catch(err => console.log("Mongo Error:", err))
 
 // ================= SCHEMA =================
+// ================= SCHEMA =================
 const SubjectSchema = new mongoose.Schema({
   user: String,
   name: String,
@@ -27,6 +28,63 @@ const SubjectSchema = new mongoose.Schema({
 })
 
 const Subject = mongoose.model("Subject", SubjectSchema)
+
+
+// ✅ ADD USER SCHEMA YAHI
+const UserSchema = new mongoose.Schema({
+  username: String,
+  password: String
+})
+
+const User = mongoose.model("User", UserSchema)
+
+
+// ================= AUTH ROUTES =================
+
+// ✅ STEP 2 (SIGNUP) YAHI ADD KARO
+app.post("/signup", async (req, res) => {
+  try {
+    const { username, password } = req.body
+
+    const existing = await User.findOne({ username })
+    if (existing) {
+      return res.json({ message: "User already exists" })
+    }
+
+    const user = new User({ username, password })
+    await user.save()
+
+    res.json({ message: "Signup successful" })
+
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ error: "Signup failed" })
+  }
+})
+
+
+// ✅ STEP 3 (LOGIN) YAHI ADD KARO
+app.post("/login", async (req, res) => {
+  try {
+    const { username, password } = req.body
+
+    const user = await User.findOne({ username, password })
+
+    if (!user) {
+      return res.json({ message: "Invalid credentials" })
+    }
+
+    res.json({
+      message: "Login successful",
+      user: { username }
+    })
+
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ error: "Login failed" })
+  }
+})
+
 
 // ================= GENERATE SMART TIMETABLE =================
 app.post("/generate-timetable", async (req, res) => {
