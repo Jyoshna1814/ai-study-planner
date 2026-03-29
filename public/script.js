@@ -122,7 +122,9 @@ if(s.completedHours < 2){
 s.difficulty += 1
 }
 })
-
+// 🔥 FETCH REAL SUBJECTS FROM DB
+const dbSubjects = await Subject.find({ user: subjects[0]?.user })
+subjects = dbSubjects
 const examDate = document.getElementById("examDate").value
 const hoursPerDay = Number(document.getElementById("studyHours").value)
 const response = await fetch("/generate-timetable",{
@@ -152,13 +154,15 @@ showChart(data.timetable[data.timetable.length-1].plan)
 }
 
 // ================= PROGRESS =================
-async function markDone(subject, hours){
+async function markDone(id, hours){
+
+console.log("Sending ID:", id) 
 
 await fetch("/update-progress",{
 method:"POST",
 headers:{"Content-Type":"application/json"},
 body:JSON.stringify({
-  subject: subject,
+  subjectId: id,
   hours: Number(hours)
 })
 })
