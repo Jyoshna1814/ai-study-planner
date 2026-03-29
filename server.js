@@ -119,7 +119,7 @@ app.post("/generate-timetable", async (req, res) => {
   }
 })
 
-// GET SUBJECTS (ADD THIS)
+// GET SUBJECTS 
 app.get("/subjects/:user", async (req, res) => {
   const subjects = await Subject.find({ user: req.params.user })
   res.json(subjects)
@@ -132,6 +132,28 @@ app.delete("/delete-subject/:id", async (req, res) => {
   } catch (err) {
     console.log(err)
     res.status(500).json({ error: "Delete failed" })
+  }
+})
+// ADD SUBJECT
+app.post("/add-subject", async (req, res) => {
+  try {
+
+    const { user, name, difficulty, weightage } = req.body
+
+    const newSubject = new Subject({
+      user,
+      name,
+      difficulty: Number(difficulty),
+      weightage: Number(weightage)
+    })
+
+    await newSubject.save()
+
+    res.json({ message: "Subject added" })
+
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ error: "Add subject failed" })
   }
 })
 

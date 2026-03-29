@@ -47,6 +47,7 @@ location.reload()
 
 // ================= SUBJECT =================
 function addSubject(){
+
 let subject = document.getElementById("subjectInput").value
 let difficulty = document.getElementById("difficultyInput").value
 let weightage = document.getElementById("weightageInput").value
@@ -61,9 +62,13 @@ difficulty: Number(difficulty),
 weightage: Number(weightage)
 })
 })
-.then(()=> loadSubjects())
-}
+.then(res=>res.json())
+.then(data=>{
+alert("Subject added ✅")
+loadSubjects()
+})
 
+}
 function loadSubjects(){
 fetch("/subjects/"+currentUser.username)
 .then(res=>res.json())
