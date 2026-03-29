@@ -161,9 +161,16 @@ app.post("/add-subject", async (req, res) => {
 app.post("/update-progress", async (req, res) => {
   try {
 
-    const { subjectId, hours } = req.body
+    const { subjectName, hours, user } = req.body
 
-    const subject = await Subject.findById(subjectId)
+    if(!user){
+      return res.json({ message: "User missing" })
+    }
+
+    const subject = await Subject.findOne({
+      name: subjectName,
+      user: user
+    })
 
     if (!subject) {
       return res.json({ message: "Subject not found" })

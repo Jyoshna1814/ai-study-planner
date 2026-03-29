@@ -144,21 +144,18 @@ showChart(data.timetable[data.timetable.length-1].plan)
 // ================= PROGRESS =================
 async function markDone(subject, hours){
 
-await fetch("/update-progress",{
-  method:"POST",
-  headers:{"Content-Type":"application/json"},
-  body:JSON.stringify({
-    subjectName:subject,
-    hours:Number(hours),
-    user: currentUser.username
+  await fetch("/update-progress",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      subjectName: subject,
+      hours: Number(hours),
+      user: currentUser.username
+    })
   })
-})
 
-// 🔥 STEP A: reload progress bar
-await loadProgress()
-
-// 🔥 STEP B: RE-GENERATE timetable automatically
-await generateTimetable()
+  await loadProgress()
+  generateTimetable()
 }
 async function loadProgress(){
 
