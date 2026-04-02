@@ -12,13 +12,11 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"))
 })
 
-// ================= DB CONNECT =================
 mongoose.connect(process.env.MONGO_URI)
 .then(()=> console.log("MongoDB connected"))
 .catch(err => console.log("Mongo Error:", err))
 
-// ================= SCHEMA =================
-// ================= SCHEMA =================
+
 const SubjectSchema = new mongoose.Schema({
   user: String,
   name: String,
@@ -29,8 +27,6 @@ const SubjectSchema = new mongoose.Schema({
 
 const Subject = mongoose.model("Subject", SubjectSchema)
 
-
-// ✅ ADD USER SCHEMA YAHI
 const UserSchema = new mongoose.Schema({
   username: String,
   password: String
@@ -38,10 +34,6 @@ const UserSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", UserSchema)
 
-
-// ================= AUTH ROUTES =================
-
-// ✅ STEP 2 (SIGNUP) YAHI ADD KARO
 app.post("/signup", async (req, res) => {
   try {
     const { username, password } = req.body
@@ -62,8 +54,6 @@ app.post("/signup", async (req, res) => {
   }
 })
 
-
-// ✅ STEP 3 (LOGIN) YAHI ADD KARO
 app.post("/login", async (req, res) => {
   try {
     const { username, password } = req.body
@@ -85,8 +75,6 @@ app.post("/login", async (req, res) => {
   }
 })
 
-
-// ================= GENERATE SMART TIMETABLE =================
 app.post("/generate-timetable", async (req, res) => {
   try {
 
@@ -100,7 +88,7 @@ app.post("/generate-timetable", async (req, res) => {
 
     let timetable = []
 
-    // 🔥 STEP 1: Calculate base score
+  
     subjects.forEach(s => {
 
   s.completedHours = s.completedHours || 0
@@ -108,17 +96,16 @@ app.post("/generate-timetable", async (req, res) => {
   const weight = Number(s.weightage) || 1
   const diff = Number(s.difficulty) || 1
 
-  // 🔥 STRONG PRIORITY LOGIC
+
   s.baseScore = (weight * weight) * 0.7 + (diff * diff) * 0.3
 
-  // 🔥 weak subject boost
+  
   if (diff >= 4) s.baseScore *= 1.5
 
-  // 🔥 missed target boost
   if (s.completedHours < 2) s.baseScore *= 1.4
 
 })
-    // ================= DAILY PLAN =================
+  
     for (let d = 1; d <= daysLeft; d++) {
 
       let dayPlan = []
@@ -131,14 +118,13 @@ app.post("/generate-timetable", async (req, res) => {
 
   let urgency = 1 + (d / daysLeft)
 
-  // 🔥 SUBJECT BASED DIFFERENCE
   let subjectFactor = (weight * 0.7) + (diff * 0.3)
 
   let revision = d > daysLeft * 0.7 ? 1.5 : 1
 
   let adjusted = s.baseScore * urgency * revision * subjectFactor
 
-  // 🔥 EXTRA BOOST
+
   if(diff >= 4) adjusted *= 1.3
 
   s.adjusted = adjusted
@@ -160,7 +146,7 @@ app.post("/generate-timetable", async (req, res) => {
 
       })
 
-      // sort by priority
+
       dayPlan.sort((a,b)=> b.hours - a.hours)
 
       timetable.push({
@@ -177,7 +163,6 @@ app.post("/generate-timetable", async (req, res) => {
   }
 })
 
-// GET SUBJECTS 
 app.get("/subjects/:user", async (req, res) => {
   const subjects = await Subject.find({ user: req.params.user })
   res.json(subjects)
@@ -192,7 +177,6 @@ app.delete("/delete-subject/:id", async (req, res) => {
     res.status(500).json({ error: "Delete failed" })
   }
 })
-// ADD SUBJECT
 app.post("/add-subject", async (req, res) => {
   try {
 
@@ -215,7 +199,6 @@ app.post("/add-subject", async (req, res) => {
   }
 })
 
-// ================= UPDATE PROGRESS =================
 app.post("/update-progress", async (req, res) => {
   try {
 
@@ -245,8 +228,6 @@ app.post("/update-progress", async (req, res) => {
   }
 })
 
-
-// ================= GET PROGRESS =================
 app.get("/progress/:user", async (req, res) => {
   try {
 
@@ -261,7 +242,7 @@ app.get("/progress/:user", async (req, res) => {
 
     subjects.forEach(s => {
 
-      // realistic expected hours
+    
       let expected = (s.weightage * 2 + s.difficulty * 2)
 
       totalAssigned += expected
@@ -285,8 +266,6 @@ app.get("/progress/:user", async (req, res) => {
   }
 })
 
-
-// ================= SERVER =================
 const PORT = process.env.PORT || 5000
 
 app.listen(PORT, () => {

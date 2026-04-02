@@ -1,7 +1,6 @@
 let currentUser = null
 let chart;
 
-// ================= AUTH =================
 function signup(){
 let username = document.getElementById("username").value
 let password = document.getElementById("password").value
@@ -28,19 +27,15 @@ body:JSON.stringify({username,password})
 .then(res=>res.json())
 .then(data=>{
 
-// ✅ SUCCESS CHECK FIX
 if(data.user){
 
 currentUser = data.user
 
-// ✅ SAVE LOGIN
 localStorage.setItem("user", JSON.stringify(currentUser))
 
-// ✅ UI CHANGE
 document.getElementById("authBox").style.display="none"
 document.getElementById("logoutBtn").style.display="block"
 
-// ✅ STEP 4 (IMPORTANT)
 loadSubjects()
 loadProgress()
 
@@ -56,7 +51,6 @@ localStorage.removeItem("user")
 location.reload()
 }
 
-// ================= SUBJECT =================
 function addSubject(){
 
 let subject = document.getElementById("subjectInput").value
@@ -115,7 +109,6 @@ body:JSON.stringify({ name:newName })
 .then(()=> loadSubjects())
 }
 
-// ================= TIMETABLE =================
 async function generateTimetable(){
 
 const res = await fetch("/subjects/" + currentUser.username)
@@ -135,24 +128,38 @@ const data = await response.json()
 let result = document.getElementById("planResult")
 result.innerHTML=""
 
-// 🔥 FIXED LOOP
+
 data.timetable.forEach(day=>{
   let div = document.createElement("div")
   div.innerHTML = `<h3>Day ${day.day}</h3>`
 
   day.plan.forEach(p=>{
     div.innerHTML += `
-      ${p.subject} - ${p.hours.toFixed(2)}h
+      ${p.subject} - ${formatTime(p.hours)}
       <button onclick="markDone('${p.subject}', ${p.hours})">Done</button><br>
     `
   })
 
   result.appendChild(div)
 })
+function formatTime(hours){
 
+  let totalMinutes = Math.round(hours * 60)
+
+  let hr = Math.floor(totalMinutes / 60)
+  let min = totalMinutes % 60
+
+  if(hr === 0){
+    return `${min} min`
+  }
+
+  return `${hr} hr ${min} min`
+}
+if(min === 0){
+  return `${hr} hr`
+}
 showChart(data.timetable[data.timetable.length-1].plan)
 }
-// ================= PROGRESS =================
 async function markDone(subject, hours){
 
   await fetch("/update-progress",{
@@ -179,7 +186,6 @@ bar.style.width = data.progress + "%"
 bar.innerText = data.progress + "%"
 }
 
-// ================= CHART =================
 function showChart(plan){
 
 let labels = plan.map(p=>p.subject)
@@ -203,7 +209,6 @@ data:values
 })
 }
 
-// ================= TIMER =================
 let timer
 let timeLeft = 25 * 60
 
@@ -243,7 +248,6 @@ updateTimer()
 
 updateTimer()
 
-// ================= AUTO LOGIN =================
 window.onload = function(){
 let savedUser = localStorage.getItem("user")
 
