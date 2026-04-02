@@ -177,38 +177,45 @@ async function markDone(subject, hours){
 }
 async function loadProgress(){
 
-const res = await fetch("/progress/" + currentUser.username)
-const data = await res.json()
+  const res = await fetch("/progress/" + currentUser.username)
+  const data = await res.json()
 
-let bar = document.getElementById("progressBar")
+  const bar = document.getElementById("progressBar")
 
-bar.style.width = data.progress + "%"
-bar.innerText = data.progress + "%"
+  const progressValue = Number(data.progress)
+
+  bar.style.width = progressValue + "%"
+  bar.innerText = progressValue.toFixed(2) + "%"
 }
-
 function showChart(plan){
 
-let labels = plan.map(p=>p.subject)
-let values = plan.map(p=>p.hours)
+  const canvas = document.getElementById("progressChart")
 
-const ctx = document.getElementById("progressChart").getContext("2d")
+  if(!canvas){
+    console.log("Chart canvas not found")
+    return
+  }
 
-if(chart){
-chart.destroy()
+  const ctx = canvas.getContext("2d")
+
+  let labels = plan.map(p => p.subject)
+  let values = plan.map(p => p.hours)
+
+  if(chart){
+    chart.destroy()
+  }
+
+  chart = new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels: labels,
+      datasets:[{
+        label:'Study Hours',
+        data: values
+      }]
+    }
+  })
 }
-
-chart = new Chart(ctx,{
-type:'bar',
-data:{
-labels:labels,
-datasets:[{
-label:'Study Hours',
-data:values
-}]
-}
-})
-}
-
 let timer
 let timeLeft = 25 * 60
 
