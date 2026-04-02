@@ -1,71 +1,69 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>AI Study Planner</title>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<link rel="stylesheet" href="style.css">
-
+  <title>AI Study Planner</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <div class="container">
 
-<h1>📚 AI Smart Study Planner</h1>
+  <h1>📚 AI Smart Study Planner</h1>
 
-<div id="authBox">
-<input id="username" placeholder="Username">
-<input id="password" type="password" placeholder="Password">
-<button onclick="signup()">Signup</button>
-<button onclick="login()">Login</button>
-</div>
-
-<button id="logoutBtn" onclick="logout()" style="display:none;">Logout</button>
-
-<hr>
-
-<h2>Add Subject</h2>
-
-<input id="subjectInput" placeholder="Subject name">
-<input id="difficultyInput" type="number" placeholder="Difficulty (1-5)">
-<input id="weightageInput" type="number" placeholder="Weightage (%)">
-<button onclick="addSubject()">Add</button>
-
-<ul id="subjectList"></ul>
-
-<hr>
-
-<h2>AI Study Plan</h2>
-
-<input id="examDate" type="date">
-<input id="studyHours" placeholder="Hours per day">
-
-<button onclick="generateTimetable()">Generate AI Timetable</button>
-
-<div id="planResult"></div>
-
-<hr>
-
-<h2>Study Progress</h2>
-
-<div style="width:100%;background:#ddd;border-radius:10px;">
-  <div id="progressBar" 
-  style="width:0%;background:green;color:white;padding:5px;border-radius:10px;">
-    0%
+  <div id="authBox">
+    <input id="username" placeholder="Username">
+    <input id="password" type="password" placeholder="Password">
+    <button onclick="signup()">Signup</button>
+    <button onclick="login()">Login</button>
   </div>
-</div>
 
-<canvas id="progressChart"></canvas>
+  <button id="logoutBtn" onclick="logout()" style="display:none;">Logout</button>
 
-<hr>
+  <hr>
 
-<h2>Pomodoro Timer</h2>
+  <h2>Add Subject</h2>
 
-<h1 id="timer">25:00</h1>
-<button onclick="startTimer()">Start</button>
-<button onclick="stopTimer()">Stop</button>
-<button onclick="resetTimer()">Reset</button>
+  <input id="subjectInput" placeholder="Subject name">
+  <input id="difficultyInput" type="number" placeholder="Difficulty (1-5)">
+  <input id="weightageInput" type="number" placeholder="Weightage (%)">
+  <button onclick="addSubject()">Add</button>
+
+  <ul id="subjectList"></ul>
+
+  <hr>
+
+  <h2>AI Study Plan</h2>
+
+  <input id="examDate" type="date">
+  <input id="studyHours" placeholder="Hours per day">
+
+  <button onclick="generateTimetable()">Generate AI Timetable</button>
+
+  <div id="planResult"></div>
+
+  <hr>
+
+  <h2>Study Progress</h2>
+
+  <div style="width:100%;background:#ddd;border-radius:10px;">
+    <div id="progressBar"
+      style="width:0%;background:green;color:white;padding:5px;border-radius:10px;">
+      0%
+    </div>
+  </div>
+
+  <canvas id="progressChart"></canvas>
+
+  <hr>
+
+  <h2>Pomodoro Timer</h2>
+
+  <h1 id="timer">25:00</h1>
+  <button onclick="startTimer()">Start</button>
+  <button onclick="stopTimer()">Stop</button>
+  <button onclick="resetTimer()">Reset</button>
 
 </div>
 
