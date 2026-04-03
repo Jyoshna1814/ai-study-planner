@@ -141,12 +141,9 @@ async function generateTimetable(){
 
   // CALENDAR GRID
   let calendarContainer = document.createElement("div")
-  calendarContainer.style.display = "grid"
-  calendarContainer.style.gridTemplateColumns = "repeat(2, 1fr)"
-  calendarContainer.style.gap = "15px"
-  calendarContainer.style.marginTop = "20px"
+  calendarContainer.className= "calendar-grid"
 
-  data.timetable.forEach(day=>{
+  data.timetable.slice(0,4).forEach(day=>{
     let div = document.createElement("div")
     div.className = "day-card"
 
