@@ -223,7 +223,7 @@ async function generateTimetable(){
 }
 async function markDone(subject, hours){
 
-  const res = await fetch("/update-progress",{
+  await fetch("/update-progress",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({
@@ -233,13 +233,13 @@ async function markDone(subject, hours){
     })
   })
 
-  const data = await res.json()
-
   alert("✅ Session completed successfully!")
 
   await loadProgress()
 
-  await generateTimetable()
+  setTimeout(() => {
+    generateTimetable()
+  }, 300)
 }
 async function loadProgress(){
 
@@ -257,21 +257,16 @@ function showChart(plan){
 
   const canvas = document.getElementById("progressChart")
 
-  if(!canvas){
-    console.log("Chart canvas not found")
-    return
-  }
-
-  canvas.style.marginTop = "30px"
-  canvas.style.height = "300px"
+  if(!canvas) return
 
   const ctx = canvas.getContext("2d")
 
-  let labels = plan.map(p => p.subject)
-  let values = plan.map(p => p.hours)
+  const labels = plan.map(p => p.subject)
+  const values = plan.map(p => p.hours)
 
   if(chart){
     chart.destroy()
+    chart = null
   }
 
   chart = new Chart(ctx,{
@@ -280,13 +275,13 @@ function showChart(plan){
       labels: labels,
       datasets:[{
         label:'Study Hours',
-        data: values,
-        backgroundColor: ['#4CAF50','#2196F3','#FF9800']
+        data: values
       }]
     },
     options:{
       responsive:true,
-      maintainAspectRatio:false
+      maintainAspectRatio:false,
+      animation:false
     }
   })
 }
