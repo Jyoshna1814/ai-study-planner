@@ -152,7 +152,7 @@ async function generateTimetable(){
 
     result.appendChild(div)
   })
-
+  
   if(data.timetable.length > 7){
   let extra = document.createElement("div")
   extra.innerHTML = `<h3>+ ${data.timetable.length - 7} more days remaining</h3>`
@@ -162,7 +162,7 @@ async function generateTimetable(){
 }
 async function markDone(subject, hours){
 
-  await fetch("/update-progress",{
+  const res = await fetch("/update-progress",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({
@@ -172,8 +172,13 @@ async function markDone(subject, hours){
     })
   })
 
+  const data = await res.json()
+
+  alert("✅ Session completed successfully!")
+
   await loadProgress()
-  generateTimetable()
+
+  await generateTimetable()
 }
 async function loadProgress(){
 
