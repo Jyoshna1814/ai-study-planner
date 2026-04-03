@@ -139,78 +139,89 @@ async function generateTimetable(){
   let result = document.getElementById("planResult")
   result.innerHTML = ""
 
- let calendarContainer = document.createElement("div")
-calendarContainer.style.display = "grid"
-calendarContainer.style.gridTemplateColumns = "repeat(2, 1fr)"
-calendarContainer.style.gap = "15px"
+  // CALENDAR GRID
+  let calendarContainer = document.createElement("div")
+  calendarContainer.style.display = "grid"
+  calendarContainer.style.gridTemplateColumns = "repeat(2, 1fr)"
+  calendarContainer.style.gap = "15px"
+  calendarContainer.style.marginTop = "20px"
 
-data.timetable.slice(0, 7).forEach(day=>{
-  let card = document.createElement("div")
+  data.timetable.forEach(day=>{
+    let div = document.createElement("div")
+    div.className = "day-card"
 
-  card.style.border = "1px solid #ccc"
-  card.style.padding = "15px"
-  card.style.borderRadius = "10px"
-  card.style.background = "white"
-  card.style.color = "black"
-  card.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)"
-  card.style.minHeight = "180px"
+    div.style.background = "white"
+    div.style.color = "black"
+    div.style.padding = "20px"
+    div.style.borderRadius = "15px"
+    div.style.boxShadow = "0 4px 10px rgba(0,0,0,0.2)"
 
-  card.innerHTML = `<h3>📅 Day ${day.day}</h3>`
+    div.innerHTML = `<h3>📅 Day ${day.day}</h3>`
 
-  day.plan.forEach(p=>{
-    card.innerHTML += `
-      <div style="margin:8px 0;">
-        ${p.subject} - ${formatTime(p.hours)}
-        <button 
-          onclick="markDone('${p.subject}', ${p.hours})"
-          style="
-            margin-left:10px;
-            padding:5px 10px;
-            background:orange;
-            color:white;
-            border:none;
-            border-radius:6px;
-            cursor:pointer;
-          ">
-          Done
-        </button>
-      </div>
+    day.plan.forEach(p=>{
+      div.innerHTML += `
+        <p>
+          ${p.subject} - ${formatTime(p.hours)}
+          <button onclick="markDone('${p.subject}', ${p.hours})">
+            Done
+          </button>
+        </p>
+      `
+    })
+
+    calendarContainer.appendChild(div)
+  })
+
+  result.appendChild(calendarContainer)
+
+  // REMAINING TARGET
+  let remainingDiv = document.createElement("div")
+  remainingDiv.style.marginTop = "20px"
+  remainingDiv.style.background = "white"
+  remainingDiv.style.color = "black"
+  remainingDiv.style.padding = "15px"
+  remainingDiv.style.borderRadius = "15px"
+
+  remainingDiv.innerHTML = "<h3>⚠ Remaining Target</h3>"
+
+  subjects.forEach(s => {
+    let expectedHours = (s.weightage * 2 + s.difficulty * 2)
+    let completed = s.completedHours || 0
+    let remaining = Math.max(0, expectedHours - completed)
+
+    remainingDiv.innerHTML += `
+      <p>${s.name} - ${formatTime(remaining)} left</p>
     `
   })
 
-  calendarContainer.appendChild(card)
-})
+  result.appendChild(remainingDiv)
 
-result.appendChild(calendarContainer)
+  // REVISION PLANNER
+  let revisionDiv = document.createElement("div")
+  revisionDiv.style.marginTop = "20px"
+  revisionDiv.style.background = "white"
+  revisionDiv.style.color = "black"
+  revisionDiv.style.padding = "15px"
+  revisionDiv.style.borderRadius = "15px"
 
-let remainingHTML = "<h3>⚠ Remaining Target</h3>"
+  revisionDiv.innerHTML = "<h3>🔁 Revision Planner</h3>"
 
-subjects.forEach(s => {
-  let expectedHours = (s.weightage * 2 + s.difficulty * 2)
-  let completed = s.completedHours || 0
-  let remaining = Math.max(0, expectedHours - completed)
+  subjects.forEach(s=>{
+    revisionDiv.innerHTML += `
+      <p>${s.name} - 30 min revision</p>
+    `
+  })
 
-  remainingHTML += `
-    ${s.name} - ${formatTime(remaining)} left <br>
-  `
-})
-result.appendChild(remainingHTML)
-let revisionDiv = document.createElement("div")
-revisionDiv.innerHTML = `<h3>🔁 Revision Planner</h3>`
+  result.appendChild(revisionDiv)
 
-subjects.forEach(s=>{
-  if((s.completedHours || 0) > 0){
-    revisionDiv.innerHTML += `${s.name} - 30 min revision <br>`
-  }
-})
-
-result.appendChild(revisionDiv)
-
+  // EXTRA DAYS
   if(data.timetable.length > 7){
-  let extra = document.createElement("div")
-  extra.innerHTML = `<h3>+ ${data.timetable.length - 7} more days remaining</h3>`
-  result.appendChild(extra)
-}
+    let extra = document.createElement("div")
+    extra.style.marginTop = "20px"
+    extra.innerHTML = `<h3>+ ${data.timetable.length - 7} more days remaining</h3>`
+    result.appendChild(extra)
+  }
+
   showChart(data.timetable[data.timetable.length - 1].plan)
 }
 async function markDone(subject, hours){
@@ -254,6 +265,9 @@ function showChart(plan){
     return
   }
 
+  canvas.style.marginTop = "30px"
+  canvas.style.height = "300px"
+
   const ctx = canvas.getContext("2d")
 
   let labels = plan.map(p => p.subject)
@@ -269,8 +283,13 @@ function showChart(plan){
       labels: labels,
       datasets:[{
         label:'Study Hours',
-        data: values
+        data: values,
+        backgroundColor: ['#4CAF50','#2196F3','#FF9800']
       }]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false
     }
   })
 }
