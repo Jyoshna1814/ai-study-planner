@@ -139,7 +139,7 @@ async function generateTimetable(){
   let result = document.getElementById("planResult")
   result.innerHTML = ""
 
-  data.timetable.forEach(day=>{
+  data.timetable.slice(0, 7).forEach(day=>{
     let div = document.createElement("div")
     div.innerHTML = `<h3>Day ${day.day}</h3>`
 
@@ -153,6 +153,11 @@ async function generateTimetable(){
     result.appendChild(div)
   })
 
+  if(data.timetable.length > 7){
+  let extra = document.createElement("div")
+  extra.innerHTML = `<h3>+ ${data.timetable.length - 7} more days remaining</h3>`
+  result.appendChild(extra)
+}
   showChart(data.timetable[data.timetable.length - 1].plan)
 }
 async function markDone(subject, hours){
