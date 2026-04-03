@@ -139,20 +139,53 @@ async function generateTimetable(){
   let result = document.getElementById("planResult")
   result.innerHTML = ""
 
-  data.timetable.slice(0, 7).forEach(day=>{
-    let div = document.createElement("div")
-    div.innerHTML = `<h3>Day ${day.day}</h3>`
+  let calendarContainer = document.createElement("div")
+calendarContainer.style.display = "grid"
+calendarContainer.style.gridTemplateColumns = "repeat(2, 1fr)"
+calendarContainer.style.gap = "10px"
 
-    day.plan.forEach(p=>{
-      div.innerHTML += `
-        ${p.subject} - ${formatTime(p.hours)}
-        <button onclick="markDone('${p.subject}', ${p.hours})">Done</button><br>
-      `
-    })
+data.timetable.slice(0, 7).forEach(day=>{
+  let card = document.createElement("div")
+  card.style.border = "1px solid #ccc"
+  card.style.padding = "10px"
+  card.style.borderRadius = "10px"
+  card.style.background = "#f9f9f9"
 
-    result.appendChild(div)
+  card.innerHTML = `<h3>📅 Day ${day.day}</h3>`
+
+  day.plan.forEach(p=>{
+    card.innerHTML += `
+      ${p.subject} - ${formatTime(p.hours)}<br>
+    `
   })
-  
+
+  calendarContainer.appendChild(card)
+})
+
+result.appendChild(calendarContainer)
+
+let missedDiv = document.createElement("div")
+missedDiv.innerHTML = `<h3>⚠ Remaining Target</h3>`
+
+subjects.forEach(s=>{
+  let remaining = (s.weightage * 2 + s.difficulty * 2) - (s.completedHours || 0)
+
+  if(remaining > 0){
+    missedDiv.innerHTML += `${s.name} - ${remaining.toFixed(1)} hr left <br>`
+  }
+})
+
+result.appendChild(missedDiv)
+let revisionDiv = document.createElement("div")
+revisionDiv.innerHTML = `<h3>🔁 Revision Planner</h3>`
+
+subjects.forEach(s=>{
+  if((s.completedHours || 0) > 0){
+    revisionDiv.innerHTML += `${s.name} - 30 min revision <br>`
+  }
+})
+
+result.appendChild(revisionDiv)
   if(data.timetable.length > 7){
   let extra = document.createElement("div")
   extra.innerHTML = `<h3>+ ${data.timetable.length - 7} more days remaining</h3>`

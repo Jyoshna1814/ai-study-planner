@@ -91,19 +91,28 @@ app.post("/generate-timetable", async (req, res) => {
   
     subjects.forEach(s => {
 
-  s.completedHours = s.completedHours || 0
+  s.completedHours = Number(s.completedHours) || 0
 
   const weight = Number(s.weightage) || 1
   const diff = Number(s.difficulty) || 1
 
+  // total target hours per subject
+  const targetHours = (weight * 2) + (diff * 2)
 
-  s.baseScore = (weight * weight) * 0.7 + (diff * diff) * 0.3
+  // remaining target after completed session
+  const remainingHours = Math.max(0, targetHours - s.completedHours)
 
-  
-  if (diff >= 4) s.baseScore *= 1.5
+  // smart score based on remaining target
+  s.baseScore = (remainingHours * 0.7) + (diff * 0.3)
 
-  if (s.completedHours < 2) s.baseScore *= 1.4
+  // difficult subjects priority
+  if (diff >= 4) s.baseScore *= 1.4
 
+  // missed target boost
+  if (remainingHours > 5) s.baseScore *= 1.3
+
+  // revision boost
+  if (s.completedHours > 0) s.baseScore *= 1.1
 })
   
     for (let d = 1; d <= daysLeft; d++) {
