@@ -183,18 +183,18 @@ data.timetable.slice(0, 7).forEach(day=>{
 
 result.appendChild(calendarContainer)
 
-let missedDiv = document.createElement("div")
-missedDiv.innerHTML = `<h3>⚠ Remaining Target</h3>`
+let remainingHTML = "<h3>⚠ Remaining Target</h3>"
 
-subjects.forEach(s=>{
-  let remaining = (s.weightage * 2 + s.difficulty * 2) - (s.completedHours || 0)
+subjects.forEach(s => {
+  let expectedHours = (s.weightage * 2 + s.difficulty * 2)
+  let completed = s.completedHours || 0
+  let remaining = Math.max(0, expectedHours - completed)
 
-  if(remaining > 0){
-    missedDiv.innerHTML += `${s.name} - ${remaining.toFixed(1)} hr left <br>`
-  }
+  remainingHTML += `
+    ${s.name} - ${formatTime(remaining)} left <br>
+  `
 })
-
-result.appendChild(missedDiv)
+result.appendChild(remainingHTML)
 let revisionDiv = document.createElement("div")
 revisionDiv.innerHTML = `<h3>🔁 Revision Planner</h3>`
 
