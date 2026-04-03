@@ -108,42 +108,7 @@ body:JSON.stringify({ name:newName })
 })
 .then(()=> loadSubjects())
 }
-
-async function generateTimetable(){
-
-const res = await fetch("/subjects/" + currentUser.username)
-const subjects = await res.json()
-
-const examDate = document.getElementById("examDate").value
-const hoursPerDay = Number(document.getElementById("studyHours").value)
-
-const response = await fetch("/generate-timetable",{
-  method:"POST",
-  headers:{"Content-Type":"application/json"},
-  body:JSON.stringify({subjects, examDate, hoursPerDay})
-})
-
-const data = await response.json()
-
-let result = document.getElementById("planResult")
-result.innerHTML=""
-
-
-data.timetable.forEach(day=>{
-  let div = document.createElement("div")
-  div.innerHTML = `<h3>Day ${day.day}</h3>`
-
-  day.plan.forEach(p=>{
-    div.innerHTML += `
-      ${p.subject} - ${formatTime(p.hours)}
-      <button onclick="markDone('${p.subject}', ${p.hours})">Done</button><br>
-    `
-  })
-
-  result.appendChild(div)
-})
 function formatTime(hours){
-
   let totalMinutes = Math.round(hours * 60)
 
   let hr = Math.floor(totalMinutes / 60)
@@ -155,10 +120,40 @@ function formatTime(hours){
 
   return `${hr} hr ${min} min`
 }
-if(min === 0){
-  return `${hr} hr`
-}
-showChart(data.timetable[data.timetable.length-1].plan)
+async function generateTimetable(){
+
+  const res = await fetch("/subjects/" + currentUser.username)
+  const subjects = await res.json()
+
+  const examDate = document.getElementById("examDate").value
+  const hoursPerDay = Number(document.getElementById("studyHours").value)
+
+  const response = await fetch("/generate-timetable",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({subjects, examDate, hoursPerDay})
+  })
+
+  const data = await response.json()
+
+  let result = document.getElementById("planResult")
+  result.innerHTML = ""
+
+  data.timetable.forEach(day=>{
+    let div = document.createElement("div")
+    div.innerHTML = `<h3>Day ${day.day}</h3>`
+
+    day.plan.forEach(p=>{
+      div.innerHTML += `
+        ${p.subject} - ${formatTime(p.hours)}
+        <button onclick="markDone('${p.subject}', ${p.hours})">Done</button><br>
+      `
+    })
+
+    result.appendChild(div)
+  })
+
+  showChart(data.timetable[data.timetable.length - 1].plan)
 }
 async function markDone(subject, hours){
 
