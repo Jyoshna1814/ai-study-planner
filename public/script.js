@@ -139,23 +139,42 @@ async function generateTimetable(){
   let result = document.getElementById("planResult")
   result.innerHTML = ""
 
-  let calendarContainer = document.createElement("div")
+ let calendarContainer = document.createElement("div")
 calendarContainer.style.display = "grid"
 calendarContainer.style.gridTemplateColumns = "repeat(2, 1fr)"
-calendarContainer.style.gap = "10px"
+calendarContainer.style.gap = "15px"
 
 data.timetable.slice(0, 7).forEach(day=>{
   let card = document.createElement("div")
+
   card.style.border = "1px solid #ccc"
-  card.style.padding = "10px"
+  card.style.padding = "15px"
   card.style.borderRadius = "10px"
-  card.style.background = "#f9f9f9"
+  card.style.background = "white"
+  card.style.color = "black"
+  card.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)"
+  card.style.minHeight = "180px"
 
   card.innerHTML = `<h3>📅 Day ${day.day}</h3>`
 
   day.plan.forEach(p=>{
     card.innerHTML += `
-      ${p.subject} - ${formatTime(p.hours)}<br>
+      <div style="margin:8px 0;">
+        ${p.subject} - ${formatTime(p.hours)}
+        <button 
+          onclick="markDone('${p.subject}', ${p.hours})"
+          style="
+            margin-left:10px;
+            padding:5px 10px;
+            background:orange;
+            color:white;
+            border:none;
+            border-radius:6px;
+            cursor:pointer;
+          ">
+          Done
+        </button>
+      </div>
     `
   })
 
@@ -186,6 +205,7 @@ subjects.forEach(s=>{
 })
 
 result.appendChild(revisionDiv)
+
   if(data.timetable.length > 7){
   let extra = document.createElement("div")
   extra.innerHTML = `<h3>+ ${data.timetable.length - 7} more days remaining</h3>`
