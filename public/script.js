@@ -135,6 +135,7 @@ async function generateTimetable(){
   })
 
   const data = await response.json()
+  const totalStudyHoursLeft = data.daysLeft * hoursPerDay
 
   let result = document.getElementById("planResult")
   result.innerHTML = ""
@@ -180,16 +181,26 @@ async function generateTimetable(){
   remainingDiv.style.borderRadius = "15px"
 
   remainingDiv.innerHTML = "<h3>⚠ Remaining Target</h3>"
+subjects.forEach(s => {
+  let targetHours = (totalStudyHoursLeft * s.weightage) / 100
 
-  subjects.forEach(s => {
-    let expectedHours = (s.weightage * 2 + s.difficulty * 2)
-    let completed = s.completedHours || 0
-    let remaining = Math.max(0, expectedHours - completed)
+  let completedHours = Number(s.completedHours || 0)
 
-    remainingDiv.innerHTML += `
-      <p>${s.name} - ${formatTime(remaining)} left</p>
-    `
-  })
+  let remainingHours = Math.max(0, targetHours - completedHours)
+
+  let completedPercent =
+    targetHours > 0
+      ? ((completedHours / targetHours) * 100).toFixed(1)
+      : 0
+
+  remainingDiv.innerHTML += `
+    <p>
+      <b>${s.name}</b> - 
+      ${formatTime(remainingHours)} left 
+      (${completedPercent}% completed)
+    </p>
+  `
+})
 
   result.appendChild(remainingDiv)
 
