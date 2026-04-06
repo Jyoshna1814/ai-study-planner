@@ -45,37 +45,39 @@
   <input id="studyHours" placeholder="Hours per day">
 
   <button onclick="generateTimetable()">Generate AI Timetable</button>
+  <div class="dashboard-grid">
 
-  <div id="planResult"></div>
+  <div class="stats-card">
+    <h3>📅 Today Plan</h3>
+    <div id="planResult"></div>
+  </div>
 
-  <hr>
-
-  <div class="progress-section">
-    <h2>Study Progress</h2>
-
+  <div class="stats-card">
+    <h3>📈 Progress</h3>
     <div style="width:100%;background:#ddd;border-radius:10px;">
       <div id="progressBar"
       style="width:0%;color:white;padding:5px;border-radius:10px;">
         0%
       </div>
     </div>
+  </div>
 
+  <div class="stats-card chart-card">
+    <h3>📊 Subject Analysis</h3>
     <canvas id="progressChart"></canvas>
-</div>
+  </div>
 
-<div id="remainingTarget"></div>
-<div id="revisionPlanner"></div>
-
-  <hr>
-
-  <h2>Pomodoro Timer</h2>
-
-  <h1 id="timer">25:00</h1>
-  <button onclick="startTimer()">Start</button>
-  <button onclick="stopTimer()">Stop</button>
-  <button onclick="resetTimer()">Reset</button>
+  <div class="stats-card">
+    <h3>⏱ Pomodoro Timer</h3>
+    <h1 id="timer">25:00</h1>
+    <button onclick="startTimer()">Start</button>
+    <button onclick="stopTimer()">Stop</button>
+    <button onclick="resetTimer()">Reset</button>
+  </div>
 
 </div>
+
+<hr>
 
 <script src="script.js"></script>
 

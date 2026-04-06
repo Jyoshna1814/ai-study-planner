@@ -188,6 +188,21 @@ function showSingleDayPlanner() {
   `
 
   result.appendChild(div)
+  let remainingBox = document.createElement("div")
+remainingBox.className = "info-card"
+remainingBox.innerHTML = `
+  <h3>⚠ Remaining Target</h3>
+  <p>Check pending study hours before exam.</p>
+`
+result.appendChild(remainingBox)
+
+let missedBox = document.createElement("div")
+missedBox.className = "info-card"
+missedBox.innerHTML = `
+  <h3>📌 Missed Targets</h3>
+  <p>Previous incomplete tasks will be added in next day plan.</p>
+`
+result.appendChild(missedBox)
 
   showChart(day.plan)
 }
@@ -196,6 +211,9 @@ function goToNextDay() {
   currentDayIndex++
 
   localStorage.setItem("currentDayIndex", currentDayIndex)
+
+  let remainingDays = fullTimetable.length - currentDayIndex - 1
+  console.log("Remaining Days:", remainingDays)
 
   showSingleDayPlanner()
 }
@@ -230,36 +248,19 @@ async function loadProgress() {
 
 // ================= CHART =================
 function showChart(plan) {
-  const canvas = document.getElementById("progressChart")
-  if (!canvas) return
-
-  const ctx = canvas.getContext("2d")
-
-  const labels = plan.map(p => p.subject)
-  const values = plan.map(p => p.hours)
-
-  const colors = [
-    "#4CAF50",
-    "#2196F3",
-    "#FF9800",
-    "#9C27B0",
-    "#F44336"
-  ]
-
-  if (chart) {
-    chart.destroy()
-    chart = null
-  }
+  if (chart) chart.destroy()
 
   chart = new Chart(ctx, {
     type: "bar",
     data: {
-      labels: labels,
+      labels,
       datasets: [{
         label: "Study Time",
         data: values,
         backgroundColor: colors.slice(0, values.length),
-        borderRadius: 8
+        borderRadius: 12,
+        borderSkipped: false,
+        barThickness: 55
       }]
     },
     options: {
@@ -267,18 +268,50 @@ function showChart(plan) {
       maintainAspectRatio: false,
       plugins: {
         tooltip: {
+          enabled: true,
+          displayColors: true,
+          backgroundColor: "#1e293b",
+          titleColor: "#fff",
+          bodyColor: "#fff",
           callbacks: {
-            label: function (context) {
+            label: function(context) {
               return context.label + " - " + formatTime(context.raw)
+            }
+          }
+        },
+        legend: {
+          labels: {
+            color: "#111827",
+            font: {
+              size: 14,
+              weight: "bold"
             }
           }
         }
       },
       scales: {
         y: {
+          beginAtZero: true,
           ticks: {
-            callback: function (value) {
+            color: "#111827",
+            font: {
+              size: 14,
+              weight: "bold"
+            },
+            callback: function(value) {
               return formatTime(value)
+            }
+          },
+          grid: {
+            color: "rgba(0,0,0,0.08)"
+          }
+        },
+        x: {
+          ticks: {
+            color: "#111827",
+            font: {
+              size: 14,
+              weight: "bold"
             }
           }
         }
@@ -286,7 +319,6 @@ function showChart(plan) {
     }
   })
 }
-
 // ================= POMODORO =================
 let timer
 let timeLeft = 25 * 60
