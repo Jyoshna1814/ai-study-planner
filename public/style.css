@@ -154,3 +154,9 @@ margin-bottom:10px;
     border-radius: 12px;
     padding: 10px;
 }
+#progressChart{
+    height: 280px !important;
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+}

@@ -291,11 +291,33 @@ function showChart(plan){
       responsive:true,
       maintainAspectRatio:false,
       animation:false,
+      interaction:{
+        mode:'nearest',
+        intersect:false
+      },
       plugins:{
         tooltip:{
+          enabled:true,
+          backgroundColor:'#222',
+          titleColor:'#fff',
+          bodyColor:'#fff',
+          titleFont:{
+            size:14
+          },
+          bodyFont:{
+            size:13
+          },
           callbacks:{
             label:function(context){
-              return formatTime(context.raw)
+              return context.label + " - " + formatTime(context.raw)
+            }
+          }
+        },
+        legend:{
+          labels:{
+            color:'#222',
+            font:{
+              size:14
             }
           }
         }
@@ -303,8 +325,22 @@ function showChart(plan){
       scales:{
         y:{
           ticks:{
+            color:'#222',
+            font:{
+              size:13,
+              weight:'bold'
+            },
             callback:function(value){
               return formatTime(value)
+            }
+          }
+        },
+        x:{
+          ticks:{
+            color:'#222',
+            font:{
+              size:13,
+              weight:'bold'
             }
           }
         }

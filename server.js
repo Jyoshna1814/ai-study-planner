@@ -82,9 +82,15 @@ app.post("/generate-timetable", async (req, res) => {
     hoursPerDay = Number(hoursPerDay)
 
     const today = new Date()
-    const exam = new Date(examDate)
+    today.setHours(0,0,0,0)
 
-    const daysLeft = Math.max(1, Math.ceil((exam - today)/(1000*60*60*24)))
+    const exam = new Date(examDate)
+    exam.setHours(0,0,0,0)
+
+    const daysLeft = Math.max(
+    1,
+    Math.floor((exam - today) / (1000 * 60 * 60 * 24)) + 1
+  )
 
     let timetable = []
 
