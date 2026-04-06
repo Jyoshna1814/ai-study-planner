@@ -147,19 +147,30 @@ app.post("/generate-timetable", async (req, res) => {
 })
       subjects.forEach(s => {
 
-        let hours = 0
+  let totalTarget =
+    ((daysLeft * hoursPerDay) * s.weightage) / 100
 
-        if(totalScore > 0){
-          hours = (s.adjusted / totalScore) * hoursPerDay
-        }
+  let completed = s.completedHours || 0
 
-        dayPlan.push({
-          id: s._id,  
-          subject: s.name,
-          hours: Number(hours.toFixed(2))
-        })
+  let remaining = Math.max(0, totalTarget - completed)
 
-      })
+  let dailyTarget =
+    Math.min(remaining, hoursPerDay * (s.weightage / 100))
+
+  if(totalScore > 0){
+    dailyTarget =
+      Math.min(
+        remaining,
+        (s.adjusted / totalScore) * hoursPerDay
+      )
+  }
+
+  dayPlan.push({
+    id: s._id,
+    subject: s.name,
+    hours: Number(dailyTarget.toFixed(2))
+  })
+})
 
 
       dayPlan.sort((a,b)=> b.hours - a.hours)

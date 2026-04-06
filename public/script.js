@@ -223,12 +223,12 @@ subjects.forEach(s => {
   result.appendChild(revisionDiv)
 
   // EXTRA DAYS
-  if(data.timetable.length > 7){
-    let extra = document.createElement("div")
-    extra.style.marginTop = "20px"
-    extra.innerHTML = `<h3>+ ${data.timetable.length - 7} more days remaining</h3>`
-    result.appendChild(extra)
-  }
+if(data.daysLeft > 4){
+  let extra = document.createElement("div")
+  extra.style.marginTop = "20px"
+  extra.innerHTML = `<h3>+ ${data.daysLeft - 4} more days remaining</h3>`
+  result.appendChild(extra)
+}
 
   showChart(data.timetable[data.timetable.length - 1].plan)
 }
