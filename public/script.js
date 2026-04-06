@@ -256,13 +256,20 @@ async function loadProgress(){
 function showChart(plan){
 
   const canvas = document.getElementById("progressChart")
-
   if(!canvas) return
 
   const ctx = canvas.getContext("2d")
 
   const labels = plan.map(p => p.subject)
   const values = plan.map(p => p.hours)
+
+  const colors = [
+    "#4CAF50",
+    "#2196F3",
+    "#FF9800",
+    "#9C27B0",
+    "#F44336"
+  ]
 
   if(chart){
     chart.destroy()
@@ -274,14 +281,34 @@ function showChart(plan){
     data:{
       labels: labels,
       datasets:[{
-        label:'Study Hours',
-        data: values
+        label:'Study Time',
+        data: values,
+        backgroundColor: colors.slice(0, values.length),
+        borderRadius: 8
       }]
     },
     options:{
       responsive:true,
       maintainAspectRatio:false,
-      animation:false
+      animation:false,
+      plugins:{
+        tooltip:{
+          callbacks:{
+            label:function(context){
+              return formatTime(context.raw)
+            }
+          }
+        }
+      },
+      scales:{
+        y:{
+          ticks:{
+            callback:function(value){
+              return formatTime(value)
+            }
+          }
+        }
+      }
     }
   })
 }

@@ -137,3 +137,20 @@ margin-bottom:10px;
     border-radius: 10px;
     padding: 10px;
 }
+.progress-section{
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    margin-top: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+#progressBar{
+    background: linear-gradient(90deg, #00c853, #64dd17);
+}
+
+#progressChart{
+    background: white;
+    border-radius: 12px;
+    padding: 10px;
+}
