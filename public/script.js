@@ -1,412 +1,253 @@
-function openScreen(id, title) {
-  document.querySelectorAll(".screen").forEach(s => s.style.display = "none");
+// ========================= AUTH SYSTEM =========================
 
-  document.getElementById(id).style.display = "block";
-  document.getElementById("topbarTitle").innerText = title;
-}
-let currentUser = null
-let chart = null
-let currentDayIndex = 0
-let fullTimetable = []
-
-// ================= AUTH =================
 function signup() {
-  let username = document.getElementById("username").value
-  let password = document.getElementById("password").value
+    let username = document.getElementById("username").value.trim();
+    let password = document.getElementById("password").value.trim();
 
-  fetch("/signup", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password })
-  })
-    .then(res => res.json())
-    .then(data => alert(data.message))
+    if (!username || !password) {
+        alert("Username & Password required");
+        return;
+    }
+
+    let users = JSON.parse(localStorage.getItem("users") || "{}");
+
+    if (users[username]) {
+        alert("User already exists!");
+        return;
+    }
+
+    users[username] = { password, subjects: [], progress: 0 };
+    localStorage.setItem("users", JSON.stringify(users));
+
+    alert("Signup successful!");
 }
 
 function login() {
-  let username = document.getElementById("username").value
-  let password = document.getElementById("password").value
+    let username = document.getElementById("username").value.trim();
+    let password = document.getElementById("password").value.trim();
 
-  fetch("/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password })
-  })
-    .then(res => res.json())
-    .then(data => {
-      if (data.user) {
-        currentUser = data.user
+    let users = JSON.parse(localStorage.getItem("users") || "{}");
 
-        localStorage.setItem("user", JSON.stringify(currentUser))
+    if (!users[username] || users[username].password !== password) {
+        alert("Invalid credentials!");
+        return;
+    }
 
-        document.getElementById("authScreen").classList.remove("active-screen");
-        openScreen("homeScreen", "Home");
-        document.getElementById("logoutBtn").style.display = "block"
+    localStorage.setItem("currentUser", username);
 
-        loadSubjects()
-        loadProgress()
+    document.getElementById("authScreen").classList.remove("active-screen");
+    document.getElementById("homeScreen").classList.add("active-screen");
 
-        let savedPlan = localStorage.getItem("savedTimetable")
-        let savedDay = localStorage.getItem("currentDayIndex")
-
-        if (savedPlan) {
-          fullTimetable = JSON.parse(savedPlan)
-          currentDayIndex = Number(savedDay || 0)
-          showSingleDayPlanner()
-        }
-      } else {
-        alert(data.message || "Login failed ❌")
-      }
-    })
+    loadUser();
 }
 
 function logout() {
-  localStorage.clear()
-  location.reload()
+    localStorage.removeItem("currentUser");
+
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active-screen"));
+    document.getElementById("authScreen").classList.add("active-screen");
 }
 
-// ================= SUBJECTS =================
-function addSubject() {
-  let subject = document.getElementById("subjectInput").value
-  let difficulty = document.getElementById("difficultyInput").value
-  let weightage = document.getElementById("weightageInput").value
+// Load user dashboard
+function loadUser() {
+    let user = getUser();
+    if (!user) return;
 
-  fetch("/add-subject", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      user: currentUser.username,
-      name: subject,
-      difficulty: Number(difficulty),
-      weightage: Number(weightage)
-    })
-  })
-    .then(res => res.json())
-    .then(() => {
-      alert("Subject added ✅")
-      loadSubjects()
-    })
+    document.getElementById("profileName").innerText = "Logged in as: " + localStorage.getItem("currentUser");
+
+    updateProgress();
+    loadSubjects();
 }
+
+
+// ========================= USER DATA HELPER =========================
+
+function getUser() {
+    let username = localStorage.getItem("currentUser");
+    if (!username) return null;
+
+    let users = JSON.parse(localStorage.getItem("users") || "{}");
+    return users[username];
+}
+
+function saveUser(userData) {
+    let username = localStorage.getItem("currentUser");
+    let users = JSON.parse(localStorage.getItem("users") || "{}");
+
+    users[username] = userData;
+    localStorage.setItem("users", JSON.stringify(users));
+}
+
+
+// ========================= NAVIGATION =========================
+
+function openScreen(id, title) {
+    document.querySelectorAll(".screen").forEach(screen => screen.classList.remove("active-screen"));
+    document.getElementById(id).classList.add("active-screen");
+    document.getElementById("topbarTitle").innerText = title;
+}
+
+
+// ========================= SUBJECTS =========================
 
 function loadSubjects() {
-  fetch("/subjects/" + currentUser.username)
-    .then(res => res.json())
-    .then(data => {
-      let list = document.getElementById("subjectList")
-      list.innerHTML = ""
+    let user = getUser();
+    if (!user) return;
 
-      data.forEach(sub => {
-        let li = document.createElement("li")
+    let list = document.getElementById("subjectList");
+    list.innerHTML = "";
 
+    user.subjects.forEach((s, index) => {
+        let li = document.createElement("li");
         li.innerHTML = `
-          ${sub.name}
-          <button onclick="editSubject('${sub._id}','${sub.name}')">Edit</button>
-          <button onclick="deleteSubject('${sub._id}')">Delete</button>
-        `
-        list.appendChild(li)
-      })
-    })
+            ${s.subject} - Difficulty: ${s.difficulty} - Weight: ${s.weight}%
+            <button onclick="deleteSubject(${index})">❌</button>
+        `;
+        list.appendChild(li);
+    });
 }
 
-function deleteSubject(id) {
-  fetch("/delete-subject/" + id, { method: "DELETE" })
-    .then(() => loadSubjects())
-}
+function addSubject() {
+    let subject = document.getElementById("subjectInput").value.trim();
+    let difficulty = parseInt(document.getElementById("difficultyInput").value);
+    let weight = parseInt(document.getElementById("weightageInput").value);
 
-function editSubject(id, name) {
-  let newName = prompt("Edit subject", name)
-
-  fetch("/edit-subject/" + id, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name: newName })
-  })
-    .then(() => loadSubjects())
-}
-
-// ================= TIME FORMAT =================
-function formatTime(hours) {
-  let totalMinutes = Math.round(hours * 60)
-  let hr = Math.floor(totalMinutes / 60)
-  let min = totalMinutes % 60
-
-  if (hr === 0) return `${min} min`
-  return `${hr} hr ${min} min`
-}
-
-// ================= TIMETABLE =================
-async function generateTimetable() {
-  const res = await fetch("/subjects/" + currentUser.username)
-  const subjects = await res.json()
-
-  const examDate = document.getElementById("examDate").value
-  const hoursPerDay = Number(document.getElementById("studyHours").value)
-
-  const response = await fetch("/generate-timetable", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      subjects,
-      examDate,
-      hoursPerDay
-    })
-  })
-
-  const data = await response.json()
-
-  fullTimetable = data.timetable
-  currentDayIndex = 0
-
-  localStorage.setItem("savedTimetable", JSON.stringify(fullTimetable))
-  localStorage.setItem("currentDayIndex", currentDayIndex)
-
-  showSingleDayPlanner()
-}
-
-function showSingleDayPlanner() {
-  let result = document.getElementById("planResult")
-  result.innerHTML = ""
-
-  let day = fullTimetable[currentDayIndex]
-
-  if (!day) {
-    result.innerHTML = "<h3>🎉 All study days completed</h3>"
-    return
-  }
-
-  let div = document.createElement("div")
-  div.className = "day-card"
-
-  div.innerHTML = `<h2>📅 Day ${day.day}</h2>`
-
-  day.plan.forEach(p => {
-    div.innerHTML += `
-      <p>
-        ${p.subject} - ${formatTime(p.hours)}
-        <button onclick="markDone('${p.subject}', ${p.hours})">
-          Done
-        </button>
-      </p>
-    `
-  })
-
-  div.innerHTML += `
-    <button onclick="goToNextDay()">➡ Next Day</button>
-  `
-
-  result.appendChild(div)
-  let remainingBox = document.createElement("div")
-remainingBox.className = "info-card"
-remainingBox.innerHTML = `
-  <h3>⚠ Remaining Target</h3>
-  <p>Check pending study hours before exam.</p>
-`
-result.appendChild(remainingBox)
-
-let missedBox = document.createElement("div")
-missedBox.className = "info-card"
-missedBox.innerHTML = `
-  <h3>📌 Missed Targets</h3>
-  <p>Previous incomplete tasks will be added in next day plan.</p>
-`
-result.appendChild(missedBox)
-
-  showChart(day.plan)
-}
-
-function goToNextDay() {
-  currentDayIndex++
-
-
-  localStorage.setItem("currentDayIndex", currentDayIndex)
-
-  let remainingDays = fullTimetable.length - currentDayIndex - 1
-  console.log("Remaining Days:", remainingDays)
-
-  showSingleDayPlanner()
-}
-
-async function markDone(subject, hours) {
-  await fetch("/update-progress", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      subjectName: subject,
-      hours: Number(hours),
-      user: currentUser.username
-    })
-  })
-
-  alert("✅ Session completed successfully!")
-
-  await loadProgress()
-}
-
-// ================= PROGRESS =================
-async function loadProgress() {
-  const res = await fetch("/progress/" + currentUser.username)
-  const data = await res.json()
-
-  const bar = document.getElementById("progressBar")
-  const progressValue = Number(data.progress)
-
-  bar.style.width = progressValue + "%"
-  bar.innerText = progressValue.toFixed(2) + "%"
-}
-
-// ================= CHART =================
-function showChart(plan) {
-  if (chart) chart.destroy()
-
-  chart = new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels,
-      datasets: [{
-        label: "Study Time",
-        data: values,
-        backgroundColor: colors.slice(0, values.length),
-        borderRadius: 12,
-        borderSkipped: false,
-        barThickness: 55
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        tooltip: {
-          enabled: true,
-          displayColors: true,
-          backgroundColor: "#1e293b",
-          titleColor: "#fff",
-          bodyColor: "#fff",
-          callbacks: {
-            label: function(context) {
-              return context.label + " - " + formatTime(context.raw)
-            }
-          }
-        },
-        legend: {
-          labels: {
-            color: "#111827",
-            font: {
-              size: 14,
-              weight: "bold"
-            }
-          }
-        }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            color: "#111827",
-            font: {
-              size: 14,
-              weight: "bold"
-            },
-            callback: function(value) {
-              return formatTime(value)
-            }
-          },
-          grid: {
-            color: "rgba(0,0,0,0.08)"
-          }
-        },
-        x: {
-          ticks: {
-            color: "#111827",
-            font: {
-              size: 14,
-              weight: "bold"
-            }
-          }
-        }
-      }
+    if (!subject || !difficulty || !weight) {
+        alert("Fill all fields!");
+        return;
     }
-  })
+
+    let user = getUser();
+    user.subjects.push({ subject, difficulty, weight });
+    saveUser(user);
+
+    loadSubjects();
 }
-// ================= POMODORO =================
-let timer
-let timeLeft = 25 * 60
+
+function deleteSubject(index) {
+    let user = getUser();
+    user.subjects.splice(index, 1);
+    saveUser(user);
+
+    loadSubjects();
+}
+
+
+// ========================= STUDY HOURS AI =========================
+
+function calculateStudyHours() {
+    let user = getUser();
+    if (!user) return;
+
+    let output = document.getElementById("study-result");
+
+    let totalWeight = user.subjects.reduce((sum, s) => sum + s.weight, 0);
+    let totalDifficulty = user.subjects.reduce((sum, s) => sum + s.difficulty, 0);
+
+    let resultHTML = "<h3>📘 Recommended Study Hours</h3>";
+
+    user.subjects.forEach(s => {
+        let hours = ((s.weight / totalWeight) + (s.difficulty / totalDifficulty)) * 5;
+        hours = hours.toFixed(1);
+
+        resultHTML += `<p><b>${s.subject}</b> → ${hours} hrs/day</p>`;
+    });
+
+    output.innerHTML = resultHTML;
+}
+
+
+// ========================= AI TIMETABLE GENERATOR =========================
+
+function generateTimetable() {
+    let examDate = document.getElementById("examDate").value;
+    let studyHours = parseInt(document.getElementById("studyHours").value);
+
+    if (!examDate || !studyHours) {
+        alert("Please enter exam date & daily hours");
+        return;
+    }
+
+    let daysLeft = Math.ceil((new Date(examDate) - new Date()) / (1000 * 60 * 60 * 24));
+
+    let user = getUser();
+
+    let result = `<h3>📅 Days Left: ${daysLeft}</h3>`;
+    result += "<h3>📚 Study Plan</h3>";
+
+    user.subjects.forEach(s => {
+        let hrs = ((s.weight / 100) * studyHours).toFixed(1);
+        result += `<p>${s.subject} → ${hrs} hrs/day</p>`;
+    });
+
+    document.getElementById("timetableResult").innerHTML = result;
+}
+
+
+// ========================= PROGRESS SYSTEM =========================
+
+function updateProgress() {
+    let user = getUser();
+    if (!user) return;
+
+    let progress = user.progress || 0;
+
+    document.getElementById("progressBar").style.width = progress + "%";
+    document.getElementById("progressBar").innerText = progress + "%";
+
+    renderChart(progress);
+}
+
+// Chart.js Pie Chart
+function renderChart(progress) {
+    const ctx = document.getElementById("progressChart");
+
+    new Chart(ctx, {
+        type: "doughnut",
+        data: {
+            labels: ["Completed", "Remaining"],
+            datasets: [{
+                data: [progress, 100 - progress]
+            }]
+        }
+    });
+}
+
+
+// ========================= POMODORO TIMER =========================
+
+let timer;
+let timeLeft = 1500; // 25 min
 
 function updateTimer() {
-  let minutes = Math.floor(timeLeft / 60)
-  let seconds = timeLeft % 60
+    let min = Math.floor(timeLeft / 60);
+    let sec = timeLeft % 60;
 
-  document.getElementById("timer").textContent =
-    minutes.toString().padStart(2, "0") +
-    ":" +
-    seconds.toString().padStart(2, "0")
+    document.getElementById("timer").innerText =
+        `${min.toString().padStart(2, "0")}:${sec.toString().padStart(2, "0")}`;
 }
 
 function startTimer() {
-  if (timer) return
+    if (timer) return;
 
-  timer = setInterval(() => {
-    timeLeft--
-    updateTimer()
-
-    if (timeLeft <= 0) {
-      clearInterval(timer)
-      timer = null
-      alert("Session complete!")
-    }
-  }, 1000)
+    timer = setInterval(() => {
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            timer = null;
+            alert("Session Completed!");
+            return;
+        }
+        timeLeft--;
+        updateTimer();
+    }, 1000);
 }
 
 function stopTimer() {
-  clearInterval(timer)
-  timer = null
+    clearInterval(timer);
+    timer = null;
 }
 
 function resetTimer() {
-  clearInterval(timer)
-  timer = null
-  timeLeft = 25 * 60
-  updateTimer()
-}
-
-updateTimer()
-
-// ================= AUTO LOAD =================
-window.onload = function () {
-  let savedUser = localStorage.getItem("user")
-
-  if (savedUser) {
-    currentUser = JSON.parse(savedUser)
-
-    document.getElementById("authBox").style.display = "none"
-    document.getElementById("logoutBtn").style.display = "block"
-
-    loadSubjects()
-    loadProgress()
-
-    let savedPlan = localStorage.getItem("savedTimetable")
-    let savedDay = localStorage.getItem("currentDayIndex")
-
-    if (savedPlan) {
-      fullTimetable = JSON.parse(savedPlan)
-      currentDayIndex = Number(savedDay || 0)
-
-      showSingleDayPlanner()
-    }
-  }
-}
-async function calculateStudyHours() {
-  const difficulty = document.getElementById("difficulty").value;
-  const weightage = document.getElementById("weightage").value;
-  const examDate = document.getElementById("examDate").value;
-
-  const res = await fetch("/calculate-study-hours", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ difficulty, weightage, examDate })
-  });
-
-  const data = await res.json();
-
-  document.getElementById("study-result").innerHTML =
-    `<b>Recommended Study Time:</b> ${data.recommendedHoursPerDay} hours/day`;
+    timeLeft = 1500;
+    updateTimer();
 }

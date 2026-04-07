@@ -1,37 +1,94 @@
-/* ---- APP BACKGROUND ---- */
-body {
+/* ================================
+   GLOBAL STYLES – Premium UI
+================================ */
+
+* {
   margin: 0;
   padding: 0;
-  font-family: "Poppins", sans-serif;
-  background: linear-gradient(135deg, #4c6ef5, #7950f2);
-  color: white;
-  overflow-x: hidden;
+  box-sizing: border-box;
+  font-family: 'Poppins', Arial, sans-serif;
 }
 
-/* ---- TOP BAR ---- */
+body {
+  background: linear-gradient(135deg, #3a0ca3, #7209b7, #4361ee);
+  background-size: 200% 200%;
+  animation: gradientFlow 8s ease infinite;
+  color: white;
+  padding-bottom: 80px; /* space for navbar */
+}
+
+/* Background animation */
+@keyframes gradientFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+
+/* ================================
+   GLASS EFFECTS
+================================ */
+
+.glass {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  border-radius: 18px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+.glass-scale {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(14px);
+  border-radius: 18px;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.25);
+  padding: 16px;
+  animation: scaleIn 0.4s ease;
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.88); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+
+/* ================================
+   TOP BAR
+================================ */
+
 .topbar {
-  background: rgba(0,0,0,0.25);
+  width: 100%;
   padding: 12px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  backdrop-filter: blur(10px);
 }
 
 .topbar h2 {
-  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
 }
 
-.topbar button {
-  padding: 8px 12px;
-  background: #ff7a18;
+.logout-btn {
+  background: #ff4d4d;
+  padding: 8px 14px;
   border: none;
   border-radius: 10px;
+  font-size: 14px;
   color: white;
   font-weight: bold;
 }
+.logout-btn:hover {
+  background: #ff6666;
+}
 
-/* ---- SCREENS ---- */
+
+/* ================================
+   SCREEN HANDLING
+================================ */
+
 .screen {
   display: none;
   padding: 20px;
@@ -39,97 +96,189 @@ body {
 
 .active-screen {
   display: block;
+  animation: fadeIn 0.4s ease;
 }
 
-/* ---- AUTH CARD ---- */
-.auth-card, .input-card {
-  background: rgba(255,255,255,0.1);
-  padding: 20px;
-  border-radius: 18px;
-  backdrop-filter: blur(10px);
-  max-width: 400px;
-  margin: auto;
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-input {
-  width: 90%;
-  padding: 12px;
-  border-radius: 12px;
-  border: none;
+
+/* ================================
+   AUTH SCREEN
+================================ */
+
+.app-title {
+  text-align: center;
+  margin-bottom: 18px;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.auth-card input {
+  width: 100%;
   margin: 8px 0;
+  padding: 14px;
+  border: none;
+  outline: none;
+  border-radius: 12px;
+  font-size: 16px;
 }
 
-button {
-  width: 95%;
+.primary-btn, .secondary-btn, .danger-btn {
+  width: 100%;
   padding: 12px;
-  border-radius: 12px;
-  border: none;
   margin-top: 10px;
-  background: #ff7a18;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
   font-weight: bold;
   color: white;
+  transition: 0.3s;
 }
 
-/* ---- DASHBOARD ---- */
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: 1fr;
+.primary-btn { background: #00c853; }
+.primary-btn:hover { background: #00e676; }
+
+.secondary-btn { background: #2979ff; }
+.secondary-btn:hover { background: #448aff; }
+
+.danger-btn { background: #d32f2f; }
+.danger-btn:hover { background: #f44336; }
+
+
+/* ================================
+   HOME GRID
+================================ */
+
+.home-grid {
+  display: flex;
+  flex-direction: column;
   gap: 20px;
 }
 
-.stats-card {
-  background: rgba(255,255,255,0.1);
+.glass-card {
   padding: 20px;
   border-radius: 18px;
-  backdrop-filter: blur(10px);
+  animation: fadeIn 0.4s ease;
 }
+
+.glass-card h3 {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+
+/* ================================
+   PROGRESS BAR
+================================ */
 
 .progress-bg {
   width: 100%;
-  height: 30px;
-  background: rgba(255,255,255,0.3);
+  height: 28px;
+  background: rgba(255,255,255,0.25);
   border-radius: 20px;
   overflow: hidden;
-  margin-top: 10px;
 }
 
 #progressBar {
-  height: 30px;
+  height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, #00c853, #2196f3);
-  line-height: 30px;
-  text-align: center;
+  background: linear-gradient(90deg, #00e676, #2979ff);
+  border-radius: 20px;
   font-weight: bold;
+  text-align: center;
+  line-height: 28px;
+  font-size: 14px;
+  transition: width 0.4s ease;
 }
 
-/* ---- NAV BAR ---- */
+
+/* ================================
+   SUBJECT LIST
+================================ */
+
+.subject-list li {
+  padding: 14px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 14px;
+  margin: 8px 0;
+  animation: fadeIn 0.3s ease;
+  font-size: 16px;
+}
+
+.input-card input {
+  width: 100%;
+  padding: 12px;
+  margin: 6px 0;
+  border-radius: 12px;
+  outline: none;
+  border: none;
+  font-size: 15px;
+}
+
+
+/* ================================
+   TIMER
+================================ */
+
+.timer-display {
+  font-size: 44px;
+  text-align: center;
+  padding: 20px;
+  margin: 15px 0;
+}
+
+
+/* ================================
+   NAVIGATION BAR
+================================ */
+
 .navbar {
   position: fixed;
   bottom: 0;
   width: 100%;
-  background: rgba(0,0,0,0.35);
-  backdrop-filter: blur(12px);
+  padding: 10px 5px;
   display: flex;
   justify-content: space-around;
-  padding: 14px 0;
+  backdrop-filter: blur(12px);
+  background: rgba(0,0,0,0.25);
+  border-radius: 18px 18px 0 0;
 }
 
-.navbar button {
-  background: transparent;
+.nav-btn {
+  background: none;
   border: none;
   font-size: 26px;
   color: white;
+  padding: 8px;
+  transition: 0.2s;
 }
 
-/* ---- SUBJECT LIST ---- */
-ul {
-  list-style: none;
-  padding: 0;
+.nav-btn:active {
+  transform: scale(1.2);
 }
 
-li {
-  background: rgba(255,255,255,0.15);
-  padding: 12px;
-  border-radius: 14px;
-  margin-top: 10px;
+
+/* ================================
+   EXTRA SECTIONS
+================================ */
+
+.section-title {
+  font-size: 24px;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.timetable-box {
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: 12px;
+}
+
+.study-output {
+  margin-top: 15px;
+  padding: 15px;
+  border-radius: 12px;
 }
