@@ -394,3 +394,19 @@ window.onload = function () {
     }
   }
 }
+async function calculateStudyHours() {
+  const difficulty = document.getElementById("difficulty").value;
+  const weightage = document.getElementById("weightage").value;
+  const examDate = document.getElementById("examDate").value;
+
+  const res = await fetch("/calculate-study-hours", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ difficulty, weightage, examDate })
+  });
+
+  const data = await res.json();
+
+  document.getElementById("study-result").innerHTML =
+    `<b>Recommended Study Time:</b> ${data.recommendedHoursPerDay} hours/day`;
+}

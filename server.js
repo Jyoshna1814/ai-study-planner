@@ -291,7 +291,51 @@ app.get("/progress/:user", async (req, res) => {
     res.status(500).json({ error: "Progress fetch failed" })
   }
 })
+// ----------------------------------------
+// SMART STUDY HOURS CALCULATION (NEW API)
+// ----------------------------------------
+app.post("/calculate-study-hours", (req, res) => {
+  try {
+    const { difficulty, weightage, examDate } = req.body;
 
+    if (!difficulty || !weightage || !examDate) {
+      return res.json({ error: "Missing values" });
+    }
+
+    // Convert exam date
+    const exam = new Date(examDate);
+    const today = new Date();
+
+    const daysLeft = Math.max(
+      1,
+      Math.floor((exam - today) / (1000 * 60 * 60 * 24))
+    );
+
+    // difficulty factor
+    const difficultyFactorMap = {
+      1: 1,   // Easy
+      2: 1.2,
+      3: 1.5, // Medium
+      4: 1.7,
+      5: 2    // Hard
+    };
+
+    const difficultyFactor = difficultyFactorMap[difficulty] || 1;
+
+    // Final study hour formula
+    const studyHours =
+      (difficultyFactor * Number(weightage)) / Number(daysLeft);
+
+    res.json({
+      daysLeft,
+      recommendedHoursPerDay: Number(studyHours.toFixed(2))
+    });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Study hour calculation failed" });
+  }
+});
 const PORT = process.env.PORT || 5000
 
 app.listen(PORT, () => {
