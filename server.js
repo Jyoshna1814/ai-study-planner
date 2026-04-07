@@ -1,111 +1,299 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-import json
+const express = require("express")
+const cors = require("cors")
+const mongoose = require("mongoose")
+const path = require("path")
 
-app = Flask(__name__)
-CORS(app)
+const app = express()
 
-DB_FILE = "database.json"
+app.use(cors())
+app.use(express.json())
+app.use(express.static(path.join(__dirname, "public")))
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"))
+})
 
-def load_db():
-    with open(DB_FILE, "r") as f:
-        return json.load(f)
+mongoose.connect(process.env.MONGO_URI)
+.then(()=> console.log("MongoDB connected"))
+.catch(err => console.log("Mongo Error:", err))
 
-def save_db(data):
-    with open(DB_FILE, "w") as f:
-        json.dump(data, f, indent=4)
 
-# ------------------------------
-# API HOME
-# ------------------------------
-@app.route("/")
-def home():
-    return jsonify({"message": "AI Smart Study Planner Backend Running!"})
+const SubjectSchema = new mongoose.Schema({
+  user: String,
+  name: String,
+  difficulty: Number,
+  weightage: Number,
+  completedHours: { type: Number, default: 0 }
+})
 
-# ------------------------------
-# GET ALL STUDY PLANS
-# ------------------------------
-@app.route("/plans", methods=["GET"])
-def get_plans():
-    db = load_db()
-    return jsonify(db["plans"])
+const Subject = mongoose.model("Subject", SubjectSchema)
 
-# ------------------------------
-# ADD NEW STUDY PLAN
-# ------------------------------
-@app.route("/plans", methods=["POST"])
-def add_plan():
-    data = request.get_json()
-    db = load_db()
+const UserSchema = new mongoose.Schema({
+  username: String,
+  password: String
+})
 
-    new_plan = {
-        "topic": data["topic"],
-        "difficulty": data["difficulty"],
-        "weightage": data["weightage"],
-        "examDate": data["examDate"],
-        "hours": data["hours"],
-        "completed": False
+const User = mongoose.model("User", UserSchema)
+
+app.post("/signup", async (req, res) => {
+  try {
+    const { username, password } = req.body
+
+    const existing = await User.findOne({ username })
+    if (existing) {
+      return res.json({ message: "User already exists" })
     }
 
-    db["plans"].append(new_plan)
-    save_db(db)
+    const user = new User({ username, password })
+    await user.save()
 
-    return jsonify({"message": "Plan added successfully!"})
+    res.json({ message: "Signup successful" })
 
-# ------------------------------
-# MARK PLAN COMPLETED
-# ------------------------------
-@app.route("/plans/complete", methods=["POST"])
-def complete_plan():
-    index = request.json.get("index")
-    db = load_db()
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ error: "Signup failed" })
+  }
+})
 
-    if 0 <= index < len(db["plans"]):
-        db["plans"][index]["completed"] = True
-        save_db(db)
-        return jsonify({"message": "Task marked as completed!"})
+app.post("/login", async (req, res) => {
+  try {
+    const { username, password } = req.body
 
-    return jsonify({"error": "Invalid index"}), 400
+    const user = await User.findOne({ username, password })
 
-# ------------------------------
-# TODO LIST — GET
-# ------------------------------
-@app.route("/todos", methods=["GET"])
-def get_todos():
-    db = load_db()
-    return jsonify(db["todos"])
+    if (!user) {
+      return res.json({ message: "Invalid credentials" })
+    }
 
-# ------------------------------
-# TODO LIST — ADD
-# ------------------------------
-@app.route("/todos", methods=["POST"])
-def add_todo():
-    data = request.get_json()
-    db = load_db()
+    res.json({
+      message: "Login successful",
+      user: { username }
+    })
 
-    db["todos"].append(data["task"])
-    save_db(db)
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ error: "Login failed" })
+  }
+})
 
-    return jsonify({"message": "Todo added!"})
+app.post("/generate-timetable", async (req, res) => {
+  try {
 
-# ------------------------------
-# TODO LIST — DELETE
-# ------------------------------
-@app.route("/todos/delete", methods=["POST"])
-def delete_todo():
-    index = request.json.get("index")
-    db = load_db()
+    let { subjects, examDate, hoursPerDay } = req.body
+    hoursPerDay = Number(hoursPerDay)
 
-    if 0 <= index < len(db["todos"]):
-        db["todos"].pop(index)
-        save_db(db)
-        return jsonify({"message": "Todo removed!"})
+    const today = new Date()
+    today.setHours(0,0,0,0)
 
-    return jsonify({"error": "Invalid index"}), 400
+    const exam = new Date(examDate)
+    exam.setHours(0,0,0,0)
+
+    const daysLeft = Math.max(
+    1,
+    Math.floor((exam - today) / (1000 * 60 * 60 * 24)) + 1
+  )
+
+    let timetable = []
+
+  
+    subjects.forEach(s => {
+
+  s.completedHours = Number(s.completedHours) || 0
+
+  const weight = Number(s.weightage) || 1
+  const diff = Number(s.difficulty) || 1
+
+  // total target hours per subject
+  const targetHours = (weight * 2) + (diff * 2)
+
+  // remaining target after completed session
+  const remainingHours = Math.max(0, targetHours - s.completedHours)
+
+  // smart score based on remaining target
+  s.baseScore = (remainingHours * 0.7) + (diff * 0.3)
+
+  // difficult subjects priority
+  if (diff >= 4) s.baseScore *= 1.4
+
+  // missed target boost
+  if (remainingHours > 5) s.baseScore *= 1.3
+
+  // revision boost
+  if (s.completedHours > 0) s.baseScore *= 1.1
+})
+  
+    for (let d = 1; d <= daysLeft; d++) {
+
+      let dayPlan = []
+      let totalScore = 0
+
+      subjects.forEach(s => {
+
+  const weight = Number(s.weightage) || 1
+  const diff = Number(s.difficulty) || 1
+
+  let urgency = 1 + (d / daysLeft)
+
+  let subjectFactor = (weight * 0.7) + (diff * 0.3)
+
+  let revision = d > daysLeft * 0.7 ? 1.5 : 1
+
+  let adjusted = s.baseScore * urgency * revision * subjectFactor
 
 
-# ------------------------------
-# RUN SERVER
-# ------------------------------
-if __name__ == "__main__":
-    app.run(debug=True)
+  if(diff >= 4) adjusted *= 1.3
+
+  s.adjusted = adjusted
+  totalScore += adjusted
+})
+      subjects.forEach(s => {
+
+  let totalTarget =
+    ((daysLeft * hoursPerDay) * s.weightage) / 100
+
+  let completed = s.completedHours || 0
+
+  let remaining = Math.max(0, totalTarget - completed)
+
+  let dailyTarget =
+    Math.min(remaining, hoursPerDay * (s.weightage / 100))
+
+  if(totalScore > 0){
+    dailyTarget =
+      Math.min(
+        remaining,
+        (s.adjusted / totalScore) * hoursPerDay
+      )
+  }
+
+  dayPlan.push({
+    id: s._id,
+    subject: s.name,
+    hours: Number(dailyTarget.toFixed(2))
+  })
+})
+
+
+      dayPlan.sort((a,b)=> b.hours - a.hours)
+
+      timetable.push({
+        day: d,
+        plan: dayPlan
+      })
+    }
+
+    res.json({ daysLeft, timetable })
+
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ error: "Timetable generation failed" })
+  }
+})
+
+app.get("/subjects/:user", async (req, res) => {
+  const subjects = await Subject.find({ user: req.params.user })
+  res.json(subjects)
+})
+// DELETE SUBJECT
+app.delete("/delete-subject/:id", async (req, res) => {
+  try {
+    await Subject.findByIdAndDelete(req.params.id)
+    res.json({ message: "Deleted" })
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ error: "Delete failed" })
+  }
+})
+app.post("/add-subject", async (req, res) => {
+  try {
+
+    const { user, name, difficulty, weightage } = req.body
+
+    const newSubject = new Subject({
+      user,
+      name,
+      difficulty: Number(difficulty),
+      weightage: Number(weightage)
+    })
+
+    await newSubject.save()
+
+    res.json({ message: "Subject added" })
+
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ error: "Add subject failed" })
+  }
+})
+
+app.post("/update-progress", async (req, res) => {
+  try {
+
+    const { subjectName, hours, user } = req.body
+
+    if(!user){
+      return res.json({ message: "User missing" })
+    }
+
+    const subject = await Subject.findOne({
+      name: subjectName,
+      user: user
+    })
+
+    if (!subject) {
+      return res.json({ message: "Subject not found" })
+    }
+
+    subject.completedHours += Number(hours)
+    await subject.save()
+
+    res.json({ message: "Progress updated" })
+
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ error: "Progress update failed" })
+  }
+})
+
+app.get("/progress/:user", async (req, res) => {
+  try {
+
+    const subjects = await Subject.find({ user: req.params.user })
+  
+    if (!subjects || subjects.length === 0) {
+      return res.json({ progress: 0, subjects: [] })
+    }
+
+    let totalAssigned = 0
+    let totalCompleted = 0
+
+    subjects.forEach(s => {
+
+    
+      let expected = (s.weightage * 2 + s.difficulty * 2)
+
+      totalAssigned += expected
+      totalCompleted += s.completedHours
+    })
+
+    let progress = 0
+
+    if (totalAssigned > 0) {
+      progress = (totalCompleted / totalAssigned) * 100
+    }
+
+    res.json({
+      progress: progress.toFixed(2),
+      subjects
+    })
+
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ error: "Progress fetch failed" })
+  }
+})
+
+const PORT = process.env.PORT || 5000
+
+app.listen(PORT, () => {
+  console.log("Server running on port", PORT)
+})
