@@ -1,49 +1,127 @@
+/* ---- APP BACKGROUND ---- */
 body {
-  font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(135deg, #4c6ef5, #7950f2);
   color: white;
+  overflow-x: hidden;
 }
 
-.container {
-  width: 92%;
-  max-width: 1100px;
-  margin: 30px auto;
-  padding: 25px;
-  background: rgba(255,255,255,0.08);
-  backdrop-filter: blur(12px);
-  border-radius: 24px;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+/* ---- TOP BAR ---- */
+.topbar {
+  background: rgba(0,0,0,0.25);
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  backdrop-filter: blur(10px);
 }
 
-h1, h2, h3 {
-  text-align: center;
+.topbar h2 {
+  margin: 0;
 }
 
-input {
-  padding: 12px;
-  margin: 6px;
-  border-radius: 12px;
-  border: none;
-  outline: none;
-}
-
-button {
-  padding: 10px 16px;
-  margin: 6px;
-  border: none;
-  border-radius: 12px;
+.topbar button {
+  padding: 8px 12px;
   background: #ff7a18;
+  border: none;
+  border-radius: 10px;
   color: white;
-  cursor: pointer;
   font-weight: bold;
 }
 
-button:hover {
-  background: #ff9a3d;
+/* ---- SCREENS ---- */
+.screen {
+  display: none;
+  padding: 20px;
 }
 
+.active-screen {
+  display: block;
+}
+
+/* ---- AUTH CARD ---- */
+.auth-card, .input-card {
+  background: rgba(255,255,255,0.1);
+  padding: 20px;
+  border-radius: 18px;
+  backdrop-filter: blur(10px);
+  max-width: 400px;
+  margin: auto;
+}
+
+input {
+  width: 90%;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  margin: 8px 0;
+}
+
+button {
+  width: 95%;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  margin-top: 10px;
+  background: #ff7a18;
+  font-weight: bold;
+  color: white;
+}
+
+/* ---- DASHBOARD ---- */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.stats-card {
+  background: rgba(255,255,255,0.1);
+  padding: 20px;
+  border-radius: 18px;
+  backdrop-filter: blur(10px);
+}
+
+.progress-bg {
+  width: 100%;
+  height: 30px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 20px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+#progressBar {
+  height: 30px;
+  width: 0%;
+  background: linear-gradient(90deg, #00c853, #2196f3);
+  line-height: 30px;
+  text-align: center;
+  font-weight: bold;
+}
+
+/* ---- NAV BAR ---- */
+.navbar {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(12px);
+  display: flex;
+  justify-content: space-around;
+  padding: 14px 0;
+}
+
+.navbar button {
+  background: transparent;
+  border: none;
+  font-size: 26px;
+  color: white;
+}
+
+/* ---- SUBJECT LIST ---- */
 ul {
   list-style: none;
   padding: 0;
@@ -51,95 +129,7 @@ ul {
 
 li {
   background: rgba(255,255,255,0.15);
-  padding: 10px;
-  margin: 6px 0;
-  border-radius: 12px;
-}
-
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-  margin-top: 20px;
-}
-
-.stats-card {
-  background: rgba(255,255,255,0.12);
-  backdrop-filter: blur(12px);
-  border-radius: 20px;
-  padding: 20px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-}
-
-.chart-card {
-  min-height: 380px;
-}
-
-.day-card {
-  background: rgba(255,255,255,0.15);
-  border-radius: 18px;
-  padding: 18px;
-  margin-top: 15px;
-}
-
-.day-card p {
-  background: rgba(255,255,255,0.08);
-  padding: 10px;
-  border-radius: 10px;
-}
-
-#progressBar {
-  height: 30px;
-  line-height: 30px;
-  border-radius: 20px;
-  font-weight: bold;
-  text-align: center;
-  background: linear-gradient(90deg, #22c55e, #3b82f6);
-  transition: width 0.5s ease;
-}
-
-#progressChart {
-  width: 100% !important;
-  height: 300px !important;
-  margin-top: 15px;
-  background: rgba(255,255,255,0.18);
-  border-radius: 16px;
   padding: 12px;
-}
-
-#timer {
-  font-size: 42px;
-  font-weight: bold;
-  text-align: center;
-  margin: 20px 0;
-}
-
-#remainingTarget,
-#revisionPlanner {
-  margin-top: 20px;
-  padding: 18px;
-  border-radius: 18px;
-  background: rgba(255,255,255,0.12);
-}
-
-hr {
-  border: none;
-  height: 1px;
-  background: rgba(255,255,255,0.2);
-  margin: 20px 0;
-}
-
-@media (max-width: 768px) {
-  .dashboard-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .container {
-    width: 95%;
-    padding: 18px;
-  }
-
-  #timer {
-    font-size: 34px;
-  }
+  border-radius: 14px;
+  margin-top: 10px;
 }

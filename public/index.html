@@ -1,85 +1,116 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>AI Study Planner</title>
+  <title>AI Smart Study Planner</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="style.css">
 
   <link rel="manifest" href="/manifest.json">
-<link rel="icon" type="image/png" sizes="512x512" href="/icon.png">
-<link rel="apple-touch-icon" href="/icon.png">
-<meta name="theme-color" content="#4b4f9c">
+  <link rel="icon" type="image/png" sizes="512x512" href="/icon.png">
+  <link rel="apple-touch-icon" href="/icon.png">
+  <meta name="theme-color" content="#4b4f9c">
 </head>
 
 <body>
 
-<div class="container">
+<!-- ================= TOP BAR ================= -->
+<div class="topbar">
+  <h2 id="topbarTitle">Home</h2>
+  <button id="logoutBtn" onclick="logout()">Logout</button>
+</div>
 
+<!-- ================= AUTH SCREEN ================= -->
+<div id="authScreen" class="screen active-screen">
   <h1>📚 AI Smart Study Planner</h1>
 
-  <div id="authBox">
+  <div class="auth-card">
     <input id="username" placeholder="Username">
     <input id="password" type="password" placeholder="Password">
+
     <button onclick="signup()">Signup</button>
     <button onclick="login()">Login</button>
   </div>
-
-  <button id="logoutBtn" onclick="logout()" style="display:none;">Logout</button>
-
-  <hr>
-
-  <h2>Add Subject</h2>
-
-  <input id="subjectInput" placeholder="Subject name">
-  <input id="difficultyInput" type="number" placeholder="Difficulty (1-5)">
-  <input id="weightageInput" type="number" placeholder="Weightage (%)">
-  <button onclick="addSubject()">Add</button>
-
-  <ul id="subjectList"></ul>
-
-  <hr>
-
-  <h2>AI Study Plan</h2>
-
-  <input id="examDate" type="date">
-  <input id="studyHours" placeholder="Hours per day">
-
-  <button onclick="generateTimetable()">Generate AI Timetable</button>
-  <div class="dashboard-grid">
-
-  <div class="stats-card">
-    <h3>📅 Today Plan</h3>
-    <div id="planResult"></div>
-  </div>
-
-  <div class="stats-card">
-    <h3>📈 Progress</h3>
-    <div style="width:100%;background:#ddd;border-radius:10px;">
-      <div id="progressBar"
-      style="width:0%;color:white;padding:5px;border-radius:10px;">
-        0%
-      </div>
-    </div>
-  </div>
-
-  <div class="stats-card chart-card">
-    <h3>📊 Subject Analysis</h3>
-    <canvas id="progressChart"></canvas>
-  </div>
-
-  <div class="stats-card">
-    <h3>⏱ Pomodoro Timer</h3>
-    <h1 id="timer">25:00</h1>
-    <button onclick="startTimer()">Start</button>
-    <button onclick="stopTimer()">Stop</button>
-    <button onclick="resetTimer()">Reset</button>
-  </div>
-
 </div>
 
-<hr>
+<!-- ================= HOME SCREEN ================= -->
+<div id="homeScreen" class="screen">
+  <div class="dashboard-grid">
+
+    <div class="stats-card">
+      <h3>🗓 Today Plan</h3>
+      <div id="planResult"></div>
+    </div>
+
+    <div class="stats-card">
+      <h3>📈 Progress</h3>
+      <div class="progress-bg"><div id="progressBar">0%</div></div>
+    </div>
+
+    <div class="stats-card chart-card">
+      <h3>📊 Analysis</h3>
+      <canvas id="progressChart"></canvas>
+    </div>
+
+  </div>
+</div>
+
+<!-- ================= SUBJECTS SCREEN ================= -->
+<div id="subjectsScreen" class="screen">
+  <h2>Subjects</h2>
+
+  <div class="input-card">
+    <input id="subjectInput" placeholder="Subject name">
+    <input id="difficultyInput" type="number" placeholder="Difficulty (1-5)">
+    <input id="weightageInput" type="number" placeholder="Weightage %">
+
+    <button onclick="addSubject()">Add Subject</button>
+  </div>
+
+  <ul id="subjectList"></ul>
+</div>
+
+<!-- ================= PLANNER SCREEN ================= -->
+<div id="plannerScreen" class="screen">
+  <h2>AI Study Planner</h2>
+
+  <div class="input-card">
+    <input id="examDate" type="date">
+    <input id="studyHours" placeholder="Hours per day">
+
+    <button onclick="generateTimetable()">Generate Timetable</button>
+  </div>
+
+  <div class="stats-card">
+    <div id="planResultPlanner"></div>
+  </div>
+</div>
+
+<!-- ================= TIMER SCREEN ================= -->
+<div id="timerScreen" class="screen">
+  <h2>Pomodoro Timer</h2>
+
+  <div id="timer">25:00</div>
+
+  <button onclick="startTimer()">Start</button>
+  <button onclick="stopTimer()">Stop</button>
+  <button onclick="resetTimer()">Reset</button>
+</div>
+
+<!-- ================= PROFILE SCREEN ================= -->
+<div id="profileScreen" class="screen">
+  <h2>User Profile</h2>
+  <p id="profileName"></p>
+</div>
+
+<!-- ================= NAVIGATION BAR ================= -->
+<div class="navbar">
+  <button onclick="openScreen('homeScreen', 'Home')">🏠</button>
+  <button onclick="openScreen('subjectsScreen', 'Subjects')">📘</button>
+  <button onclick="openScreen('plannerScreen', 'Planner')">🗓</button>
+  <button onclick="openScreen('timerScreen', 'Timer')">⏱</button>
+  <button onclick="openScreen('profileScreen', 'Profile')">👤</button>
+</div>
 
 <script src="script.js"></script>
-
 </body>
 </html>

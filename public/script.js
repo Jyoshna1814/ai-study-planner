@@ -1,3 +1,9 @@
+function openScreen(id, title) {
+  document.querySelectorAll(".screen").forEach(s => s.style.display = "none");
+
+  document.getElementById(id).style.display = "block";
+  document.getElementById("topbarTitle").innerText = title;
+}
 let currentUser = null
 let chart = null
 let currentDayIndex = 0
@@ -33,7 +39,8 @@ function login() {
 
         localStorage.setItem("user", JSON.stringify(currentUser))
 
-        document.getElementById("authBox").style.display = "none"
+        document.getElementById("authScreen").classList.remove("active-screen");
+        openScreen("homeScreen", "Home");
         document.getElementById("logoutBtn").style.display = "block"
 
         loadSubjects()
@@ -209,6 +216,7 @@ result.appendChild(missedBox)
 
 function goToNextDay() {
   currentDayIndex++
+
 
   localStorage.setItem("currentDayIndex", currentDayIndex)
 
