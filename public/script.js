@@ -2,7 +2,6 @@ function showScreen(screenId) {
   document.querySelectorAll(".screen").forEach(screen => {
     screen.classList.remove("active");
   });
-
   document.getElementById(screenId).classList.add("active");
 }
 
@@ -10,6 +9,14 @@ async function loadData() {
   const res = await fetch("/api/data");
   const data = await res.json();
 
+  // 🔥 UPDATE DASHBOARD
+  document.querySelector(".progress-circle span").innerText = data.progress + "%";
+  document.querySelector(".stats h3").innerText = data.streak + " Day Streak 🔥";
+
+  document.querySelectorAll(".small p")[0].innerText =
+    `${data.completed}/${data.total} Today`;
+
+  // 🔥 TASKS
   const container = document.querySelector(".tasks");
 
   container.innerHTML = `
@@ -34,18 +41,31 @@ async function loadData() {
   });
 
   document.getElementById("addTaskBtn").onclick = addTask;
+
+  // 🔥 ANALYTICS UPDATE
+  document.querySelector("#analytics .big-circle").innerText = data.progress + "%";
+
+  // 🔥 BADGES SYSTEM
+  updateBadges(data);
+}
+
+function updateBadges(data) {
+  const badges = document.querySelectorAll(".badge");
+
+  badges.forEach(b => b.classList.add("locked"));
+
+  if (data.completed >= 1) badges[0].classList.add("unlocked");
+  if (data.streak >= 3) badges[1].classList.add("unlocked");
+  if (data.completed >= 5) badges[2].classList.add("unlocked");
 }
 
 async function addTask() {
   const title = prompt("Enter your task");
-
   if (!title) return;
 
   await fetch("/api/task", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ title })
   });
 
@@ -53,10 +73,7 @@ async function addTask() {
 }
 
 async function toggleTask(index) {
-  await fetch(`/api/task/${index}`, {
-    method: "PUT"
-  });
-
+  await fetch(`/api/task/${index}`, { method: "PUT" });
   loadData();
 }
 
