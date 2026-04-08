@@ -1,28 +1,79 @@
 const express = require("express");
 const path = require("path");
+const mongoose = require("mongoose");
+
+const DailyStatus = require("./models/DailyStatus");
 
 const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.static("public"));
+
+// 🔥 CONNECT MONGODB
+mongoose.connect("mongodb+srv://jyoshna:sasmal1814@cluster0.0fnvv0m.mongodb.net/studyplanner?retryWrites=true&w=majority")
+.then(() => console.log("MongoDB Connected ✅"))
+.catch(err => console.log(err));
+
+// ROUTES
+
+// Get today's data
+app.get("/api/data", async (req, res) => {
+  const today = new Date().toDateString();
+
+  let data = await DailyStatus.findOne({ date: today });
+
+  if (!data) {
+    data = await DailyStatus.create({
+      date: today,
+      tasks: [],
+      studyTime: "0h",
+      streak: 0
+    });
+  }
+
+  res.json(data);
+});
+
+// Add task
+app.post("/api/task", async (req, res) => {
+  const today = new Date().toDateString();
+  const { title } = req.body;
+
+  let data = await DailyStatus.findOne({ date: today });
+
+  if (!data) {
+    data = await DailyStatus.create({ date: today, tasks: [] });
+  }
+
+  data.tasks.push({ title });
+  await data.save();
+
+  res.json(data);
+});
+
+// Toggle task
+app.put("/api/task/:index", async (req, res) => {
+  const today = new Date().toDateString();
+
+  let data = await DailyStatus.findOne({ date: today });
+
+  data.tasks[req.params.index].completed =
+    !data.tasks[req.params.index].completed;
+
+  await data.save();
+
+  res.json(data);
+});
 
 // Serve frontend
-app.use(express.static(path.join(__dirname, "public")));
-
-// Default route
-app.get("/", (req, res) => {
+app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// Test API route (optional)
-app.get("/api/test", (req, res) => {
-  res.json({ message: "Backend working ✅" });
-});
-
-// PORT for Render
+// PORT
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on ${PORT}`);
 });

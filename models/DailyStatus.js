@@ -1,8 +1,15 @@
 const mongoose = require("mongoose");
 
-const DailySchema = new mongoose.Schema({
-  user: String,
-  lastOpened: String   // YYYY-MM-DD
+const taskSchema = new mongoose.Schema({
+  title: String,
+  completed: { type: Boolean, default: false }
 });
 
-module.exports = mongoose.model("DailyStatus", DailySchema);
+const dailyStatusSchema = new mongoose.Schema({
+  date: String,
+  tasks: [taskSchema],
+  studyTime: String,
+  streak: Number
+});
+
+module.exports = mongoose.model("DailyStatus", dailyStatusSchema);
