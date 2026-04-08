@@ -1,12 +1,13 @@
-console.log("App Loaded");
+function showScreen(screenId) {
+  document.querySelectorAll(".screen").forEach(screen => {
+    screen.classList.remove("active");
+  });
 
-// simple interaction
+  document.getElementById(screenId).classList.add("active");
+}
+
 document.querySelectorAll("input[type='checkbox']").forEach(box => {
   box.addEventListener("change", () => {
-    if (box.checked) {
-      box.parentElement.style.opacity = "0.5";
-    } else {
-      box.parentElement.style.opacity = "1";
-    }
+    box.parentElement.style.opacity = box.checked ? "0.5" : "1";
   });
 });

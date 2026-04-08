@@ -1,75 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Smart Study Planner</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Smart Study Planner</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
 <div class="app">
 
-  <!-- Header -->
-  <div class="header">
-    <h2>Good Morning 👋</h2>
-    <p>Let's study smart today</p>
-  </div>
-
-  <!-- Stats Card -->
-  <div class="card stats">
-    <div>
-      <h3>5 Day Streak 🔥</h3>
-      <p>Consistency</p>
+  <!-- HOME SCREEN -->
+  <section id="home" class="screen active">
+    <div class="header">
+      <h2>Good Morning 👋</h2>
+      <p>Let's study smart today</p>
     </div>
 
-    <div class="progress-circle">
-      <span>78%</span>
-    </div>
-  </div>
-
-  <!-- Small Cards -->
-  <div class="row">
-    <div class="card small">
-      <h3>Tasks</h3>
-      <p>4/6 Today</p>
+    <div class="card stats">
+      <div>
+        <h3>5 Day Streak 🔥</h3>
+        <p>Consistency</p>
+      </div>
+      <div class="progress-circle"><span>78%</span></div>
     </div>
 
-    <div class="card small">
-      <h3>Study</h3>
-      <p>2h 30m</p>
-    </div>
-  </div>
-
-  <!-- Task List -->
-  <div class="tasks">
-    <h3>Today's Tasks</h3>
-
-    <div class="task">
-      <span>📘 Math Assignment</span>
-      <input type="checkbox">
+    <div class="row">
+      <div class="card small">
+        <h3>Tasks</h3>
+        <p>4/6 Today</p>
+      </div>
+      <div class="card small">
+        <h3>Study</h3>
+        <p>2h 30m</p>
+      </div>
     </div>
 
-    <div class="task">
-      <span>📖 Read History</span>
-      <input type="checkbox">
+    <div class="tasks">
+      <h3>Today's Tasks</h3>
+      <div class="task"><span>📘 Math Assignment</span><input type="checkbox"></div>
+      <div class="task"><span>📖 Read History</span><input type="checkbox"></div>
+      <div class="task"><span>🧪 Science Quiz</span><input type="checkbox" checked></div>
     </div>
+  </section>
 
-    <div class="task">
-      <span>🧪 Science Quiz</span>
-      <input type="checkbox" checked>
+  <!-- PLANNER SCREEN -->
+  <section id="planner" class="screen">
+    <h2>📅 Study Planner</h2>
+    <div class="task-card">Maths - 9:00 AM - HIGH</div>
+    <div class="task-card">Physics - 10:30 AM - MED</div>
+    <div class="task-card">Chemistry - 1:00 PM - HIGH</div>
+    <div class="task-card">History - 3:00 PM - LOW</div>
+  </section>
+
+  <!-- ANALYTICS SCREEN -->
+  <section id="analytics" class="screen">
+    <h2>📊 Analytics</h2>
+    <div class="card">
+      <h3>Consistency Score</h3>
+      <div class="big-circle">85%</div>
     </div>
+    <div class="card">
+      <h3>7 Day Streak 🔥</h3>
+      <p>🔥🔥🔥🔥🔥🔥🔥</p>
+    </div>
+    <div class="card">
+      <h3>Weekly Study</h3>
+      <p>18h 45m</p>
+    </div>
+  </section>
 
-  </div>
+  <!-- BADGES SCREEN -->
+  <section id="badges" class="screen">
+    <h2>🏆 Achievements</h2>
+    <div class="badge-grid">
+      <div class="badge unlocked">🔥 First Flame</div>
+      <div class="badge unlocked">⚔ Week Warrior</div>
+      <div class="badge unlocked">✅ Task Starter</div>
+      <div class="badge locked">🔒 10 Hour Club</div>
+      <div class="badge locked">🔒 Perfect Day</div>
+    </div>
+  </section>
 
-  <!-- Bottom Navigation -->
-  <div class="bottom-nav">
-    <button>🏠</button>
-    <button>📅</button>
-    <button>⏱</button>
-    <button>📊</button>
-    <button>🏆</button>
-  </div>
+  <!-- TIMER SCREEN -->
+  <section id="timer" class="screen">
+    <h2>⏱ Focus Timer</h2>
+    <div class="big-circle">25:00</div>
+    <button class="start-btn">Start Focus</button>
+  </section>
 
+</div>
+
+<!-- Bottom Navigation -->
+<div class="bottom-nav">
+  <button onclick="showScreen('home')">🏠</button>
+  <button onclick="showScreen('planner')">📅</button>
+  <button onclick="showScreen('timer')">⏱</button>
+  <button onclick="showScreen('analytics')">📊</button>
+  <button onclick="showScreen('badges')">🏆</button>
 </div>
 
 <script src="script.js"></script>
