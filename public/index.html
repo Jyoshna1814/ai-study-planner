@@ -1,135 +1,76 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>AI Smart Study Planner</title>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8">
+  <title>Smart Study Planner</title>
   <link rel="stylesheet" href="style.css">
-
-  <link rel="icon" type="image/png" href="assets/app-icon.png">
-  <link rel="apple-touch-icon" href="assets/app-icon.png">
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#4b4f9c">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
-
 <body>
 
-<!-- 🔷 TOP GLASS HEADER -->
-<div class="topbar glass">
-  <h2 id="topbarTitle">Home</h2>
-  <button id="logoutBtn" class="logout-btn" onclick="logout()">Logout</button>
-</div>
+<div class="app">
 
-
-<!-- 🌟 AUTH SCREEN -->
-<div id="authScreen" class="screen active-screen fade">
-  <h1 class="app-title">AI Smart Study Planner</h1>
-
-  <div class="auth-card glass-scale">
-    <input id="username" placeholder="Username">
-    <input id="password" type="password" placeholder="Password">
-
-    <button class="primary-btn" onclick="signup()">Signup</button>
-    <button class="secondary-btn" onclick="login()">Login</button>
+  <!-- Header -->
+  <div class="header">
+    <h2>Good Morning 👋</h2>
+    <p>Let's study smart today</p>
   </div>
-</div>
 
-
-<!-- 🏠 HOME SCREEN -->
-<div id="homeScreen" class="screen fade">
-
-  <div class="home-grid">
-
-    <!-- PROGRESS CARD -->
-    <div class="glass-card">
-      <h3>📈 Overall Progress</h3>
-      <div class="progress-bg"><div id="progressBar">0%</div></div>
+  <!-- Stats Card -->
+  <div class="card stats">
+    <div>
+      <h3>5 Day Streak 🔥</h3>
+      <p>Consistency</p>
     </div>
 
-    <!-- TODAY PLAN -->
-    <div class="glass-card">
-      <h3>🗓 Today Plan</h3>
-      <div id="planResult"></div>
+    <div class="progress-circle">
+      <span>78%</span>
+    </div>
+  </div>
+
+  <!-- Small Cards -->
+  <div class="row">
+    <div class="card small">
+      <h3>Tasks</h3>
+      <p>4/6 Today</p>
     </div>
 
-    <!-- ANALYSIS -->
-    <div class="glass-card">
-      <h3>📊 Study Analysis</h3>
-      <canvas id="progressChart"></canvas>
+    <div class="card small">
+      <h3>Study</h3>
+      <p>2h 30m</p>
+    </div>
+  </div>
+
+  <!-- Task List -->
+  <div class="tasks">
+    <h3>Today's Tasks</h3>
+
+    <div class="task">
+      <span>📘 Math Assignment</span>
+      <input type="checkbox">
+    </div>
+
+    <div class="task">
+      <span>📖 Read History</span>
+      <input type="checkbox">
+    </div>
+
+    <div class="task">
+      <span>🧪 Science Quiz</span>
+      <input type="checkbox" checked>
     </div>
 
   </div>
-</div>
 
-
-<!-- 📚 SUBJECTS SCREEN -->
-<div id="subjectsScreen" class="screen fade">
-
-  <h2 class="section-title">Subjects</h2>
-
-  <div class="input-card glass-scale">
-    <input id="subjectInput" placeholder="Subject name">
-    <input id="difficultyInput" type="number" placeholder="Difficulty (1-5)">
-    <input id="weightageInput" type="number" placeholder="Weightage %">
-    <button class="primary-btn" onclick="addSubject()">Add Subject</button>
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <button>🏠</button>
+    <button>📅</button>
+    <button>⏱</button>
+    <button>📊</button>
+    <button>🏆</button>
   </div>
 
-  <ul id="subjectList" class="subject-list"></ul>
-
-  <button class="calculate-btn" onclick="calculateStudyHours()">Calculate Study Hours</button>
-  <div id="study-result" class="study-output glass"></div>
-
 </div>
-
-
-<!-- 🧠 PLANNER SCREEN -->
-<div id="plannerScreen" class="screen fade">
-
-  <h2 class="section-title">AI Planner</h2>
-
-  <div class="input-card glass-scale">
-    <input id="examDate" type="date">
-    <input id="studyHours" placeholder="Hours per day">
-
-    <button class="primary-btn" onclick="generateTimetable()">Generate Timetable</button>
-  </div>
-
-  <div id="timetableResult" class="timetable-box glass"></div>
-
-</div>
-
-
-<!-- ⏱ TIMER SCREEN -->
-<div id="timerScreen" class="screen fade">
-  <h2 class="section-title">Pomodoro Timer</h2>
-
-  <div id="timer" class="timer-display glass">25:00</div>
-
-  <div class="timer-controls">
-    <button class="primary-btn" onclick="startTimer()">Start</button>
-    <button class="secondary-btn" onclick="stopTimer()">Stop</button>
-    <button class="danger-btn" onclick="resetTimer()">Reset</button>
-  </div>
-</div>
-
-
-<!-- 👤 PROFILE SCREEN -->
-<div id="profileScreen" class="screen fade">
-  <h2 class="section-title">Profile</h2>
-  <p id="profileName"></p>
-</div>
-
-
-<!-- 🔻 BOTTOM NAVIGATION -->
-<div class="navbar glass">
-  <button onclick="openScreen('homeScreen','Home')" class="nav-btn">🏠</button>
-  <button onclick="openScreen('subjectsScreen','Subjects')" class="nav-btn">📘</button>
-  <button onclick="openScreen('plannerScreen','Planner')" class="nav-btn">🗓</button>
-  <button onclick="openScreen('timerScreen','Timer')" class="nav-btn">⏱</button>
-  <button onclick="openScreen('profileScreen','Profile')" class="nav-btn">👤</button>
-</div>
-
 
 <script src="script.js"></script>
 </body>
