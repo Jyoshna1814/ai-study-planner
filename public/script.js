@@ -150,3 +150,15 @@ function showReminder() {
 
 // reminder every 1 min demo
 setInterval(showReminder, 60000);
+function generateAIPlan() {
+  const plans = [
+    "📘 8 AM - Maths practice\n⚡ 10 AM - Physics numericals\n🧪 4 PM - Chemistry revision",
+    "📖 9 AM - Biology notes\n📝 11 AM - English writing\n📊 5 PM - History revision",
+    "🧠 Focus weak subjects first: Maths + Chemistry\n⏱ 2 Pomodoro sessions recommended",
+    "🔥 Tomorrow priority: Physics + Biology\n🎯 Target 3 completed tasks"
+  ];
+
+  const randomPlan = plans[Math.floor(Math.random() * plans.length)];
+
+  document.getElementById("aiPlanText").innerText = randomPlan;
+}
