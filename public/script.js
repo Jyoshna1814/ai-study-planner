@@ -39,6 +39,7 @@ async function loadData() {
 
     container.appendChild(div);
   });
+  saveTasksOffline(data.tasks);
 
   document.getElementById("addTaskBtn").onclick = addTask;
 
@@ -125,3 +126,27 @@ function generateSuggestion() {
 }
 
 updateTimerDisplay();
+// 🔥 offline backup
+function saveTasksOffline(tasks) {
+  localStorage.setItem("studyTasks", JSON.stringify(tasks));
+}
+
+function getOfflineTasks() {
+  return JSON.parse(localStorage.getItem("studyTasks")) || [];
+}
+
+// 🔔 reminder notification
+function showReminder() {
+  if ("Notification" in window) {
+    Notification.requestPermission().then(permission => {
+      if (permission === "granted") {
+        new Notification("📚 Study Reminder", {
+          body: "Time to complete your daily tasks!"
+        });
+      }
+    });
+  }
+}
+
+// reminder every 1 min demo
+setInterval(showReminder, 60000);
