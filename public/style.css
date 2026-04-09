@@ -130,3 +130,12 @@ body {
   font-weight: bold;
   cursor: pointer;
 }
+.unlocked {
+  background: #1e293b;
+  box-shadow: 0 0 15px cyan;
+}
+
+.locked {
+  background: #374151;
+  opacity: 0.4;
+}

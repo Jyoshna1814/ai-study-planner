@@ -42,6 +42,11 @@
       <div class="task"><span>📖 Read History</span><input type="checkbox"></div>
       <div class="task"><span>🧪 Science Quiz</span><input type="checkbox" checked></div>
     </div>
+
+    <div class="card">
+    <h3>📈 Smart Insight</h3>
+    <p>You're most productive between 9 AM – 11 AM</p>
+  </div>
   </section>
 
   <!-- PLANNER SCREEN -->
@@ -82,15 +87,22 @@
     </div>
   </section>
 
-  <!-- TIMER SCREEN -->
-  <section id="timer" class="screen">
-    <h2>⏱ Focus Timer</h2>
-    <div class="big-circle">25:00</div>
-    <button class="start-btn">Start Focus</button>
-  </section>
+ <section id="timer" class="screen">
+  <h2>⏱ Focus Timer</h2>
 
-</div>
+  <div class="big-circle" id="timerDisplay">25:00</div>
 
+  <button class="start-btn" onclick="startTimer()">Start Focus</button>
+
+  <button class="start-btn" onclick="resetTimer()" style="margin-top:10px;">
+    Reset
+  </button>
+
+  <div class="card" style="margin-top:20px;">
+    <h3>🤖 AI Suggestion</h3>
+    <p id="aiSuggestion">Complete Maths first, then revise Physics.</p>
+  </div>
+</section>
 <!-- Bottom Navigation -->
 <div class="bottom-nav">
   <button onclick="showScreen('home')">🏠</button>

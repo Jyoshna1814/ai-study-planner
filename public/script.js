@@ -78,3 +78,50 @@ async function toggleTask(index) {
 }
 
 loadData();
+let timeLeft = 1500;
+let timerInterval;
+
+function updateTimerDisplay() {
+  const minutes = Math.floor(timeLeft / 60);
+  const seconds = timeLeft % 60;
+
+  document.getElementById("timerDisplay").innerText =
+    `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+
+  timerInterval = setInterval(() => {
+    if (timeLeft > 0) {
+      timeLeft--;
+      updateTimerDisplay();
+    } else {
+      clearInterval(timerInterval);
+      alert("🎉 Focus session completed!");
+      generateSuggestion();
+    }
+  }, 1000);
+}
+
+function resetTimer() {
+  clearInterval(timerInterval);
+  timeLeft = 1500;
+  updateTimerDisplay();
+}
+
+function generateSuggestion() {
+  const suggestions = [
+    "Revise Chemistry reactions now.",
+    "Take a 5 min break and continue Biology.",
+    "Focus on weak subjects first.",
+    "Practice Maths numericals next."
+  ];
+
+  const random =
+    suggestions[Math.floor(Math.random() * suggestions.length)];
+
+  document.getElementById("aiSuggestion").innerText = random;
+}
+
+updateTimerDisplay();
