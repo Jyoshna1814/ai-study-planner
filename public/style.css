@@ -119,23 +119,3 @@ body {
   color: white;
   font-size: 22px;
 }
-#addTaskBtn {
-  margin-top: 10px;
-  margin-bottom: 15px;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 10px;
-  background: cyan;
-  color: black;
-  font-weight: bold;
-  cursor: pointer;
-}
-.unlocked {
-  background: #1e293b;
-  box-shadow: 0 0 15px cyan;
-}
-
-.locked {
-  background: #374151;
-  opacity: 0.4;
-}

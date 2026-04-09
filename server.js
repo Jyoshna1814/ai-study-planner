@@ -17,6 +17,7 @@ mongoose.connect("mongodb+srv://jyoshna:sasmal1814@cluster0.0fnvv0m.mongodb.net/
 
 // ROUTES
 
+// Get today's data
 app.get("/api/data", async (req, res) => {
   const today = new Date().toDateString();
 
@@ -31,25 +32,9 @@ app.get("/api/data", async (req, res) => {
     });
   }
 
-  // 🔥 CALCULATE PROGRESS
-  const total = data.tasks.length;
-  const completed = data.tasks.filter(t => t.completed).length;
-
-  const progress = total === 0 ? 0 : Math.round((completed / total) * 100);
-
-  // 🔥 UPDATE STREAK (basic logic)
-  if (completed > 0) {
-    data.streak = data.streak + 1;
-    await data.save();
-  }
-
-  res.json({
-    ...data.toObject(),
-    progress,
-    total,
-    completed
-  });
+  res.json(data);
 });
+
 // Add task
 app.post("/api/task", async (req, res) => {
   const today = new Date().toDateString();
