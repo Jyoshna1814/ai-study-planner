@@ -154,3 +154,23 @@ body {
   border-radius: 18px;
   box-shadow: 0 0 12px rgba(0,255,255,0.2);
 }
+.planner-form{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    padding:20px;
+}
+
+.planner-form input{
+    padding:12px;
+    border-radius:10px;
+    border:none;
+}
+
+button{
+    padding:12px;
+    background:#00d4ff;
+    color:white;
+    border:none;
+    border-radius:10px;
+}

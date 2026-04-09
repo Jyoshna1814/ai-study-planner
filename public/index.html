@@ -129,6 +129,17 @@
   <button onclick="showScreen('analytics')">📊</button>
   <button onclick="showScreen('badges')">🏆</button>
 </div>
+<div class="planner-form">
+    <input id="subject" placeholder="Subject">
+    <input id="task" placeholder="Task">
+    <input id="examDate" type="date">
+    <input id="hours" placeholder="Study Hours">
+    <input id="weightage" placeholder="Weightage">
+    <input id="difficulty" placeholder="Difficulty 1-5">
+    <button onclick="addTask()">Generate AI Plan</button>
+</div>
+
+<div id="planner-output"></div>
 
 <script src="script.js"></script>
 </body>
