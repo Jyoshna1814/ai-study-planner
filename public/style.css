@@ -189,18 +189,20 @@ button{
 }
 
 #generateBtn{
+    width:100%;
     padding:12px;
     border:none;
     border-radius:8px;
     background:#00d4ff;
     color:white;
     cursor:pointer;
+    margin-top:10px;
 }
 
 .task-card{
     background:#111827;
     color:white;
     padding:15px;
-    margin:10px;
+    margin:15px;
     border-radius:12px;
 }
