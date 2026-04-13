@@ -7,76 +7,70 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <!-- TOP HEADER -->
     <header class="top-bar">
         <h1>AI Smart Study Planner</h1>
     </header>
 
-    <!-- MAIN DASHBOARD -->
     <div class="container">
 
-        <!-- GREETING -->
-        <section class="card">
+        <!-- HOME DASHBOARD -->
+        <section class="card" id="homeDashboard">
             <h2>Good Morning 👋</h2>
             <p>Let's study smart today</p>
-        </section>
 
-        <!-- STREAK + PROGRESS -->
-        <section class="dashboard-grid">
-            <div class="card">
-                <h3 id="streakCount">5 Day Streak 🔥</h3>
-                <p>Consistency</p>
-            </div>
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3 id="streakCount">5 Day Streak 🔥</h3>
+                    <p>Consistency</p>
+                </div>
 
-            <div class="card">
-                <h3>Tasks</h3>
-                <p id="taskSummary">0 Today</p>
-            </div>
+                <div class="card">
+                    <h3>Progress</h3>
+                    <p id="progressCircle">0%</p>
+                </div>
 
-            <div class="card">
-                <h3>Study</h3>
-                <p>2h 30m</p>
-            </div>
-
-            <div class="card progress-card">
-                <div id="progressCircle">0%</div>
+                <div class="card">
+                    <h3>Days Left</h3>
+                    <p id="daysLeftBox">--</p>
+                </div>
             </div>
         </section>
 
-        <!-- TASK HISTORY -->
-        <section class="card">
-            <h3>Today's Tasks</h3>
-            <div id="taskList"></div>
+        <!-- PLANNER DASHBOARD -->
+        <section class="card" id="plannerDashboard">
+            <h2>📅 AI Planner</h2>
+
+            <div id="subjectContainer">
+                <div class="subject-row">
+                    <input type="text" class="subject" placeholder="Subject Name">
+                    <input type="date" class="examDate">
+                    <input type="number" class="studyHours" placeholder="Hours">
+                    <input type="number" class="weightage" placeholder="Weightage">
+                    <input type="number" class="difficulty" placeholder="Difficulty">
+                    <button onclick="deleteSubject(this)">Delete</button>
+                </div>
+            </div>
+
+            <button onclick="addSubject()">+ Add Subject</button>
+            <button onclick="generatePlan()">Generate AI Plan</button>
         </section>
 
-        <!-- AI FORM -->
-        <section class="card">
-            <h2>🧠 AI Study Plan Generator</h2>
-
-            <input type="text" id="subject" placeholder="Enter Subject">
-
-            <input type="text" id="task" placeholder="Enter Task">
-
-            <input type="date" id="examDate">
-
-            <input type="number" id="studyHours" placeholder="Available Study Hours">
-
-            <input type="number" id="weightage" placeholder="Subject Weightage (1-100)">
-
-            <input type="number" id="difficulty" placeholder="Difficulty Level (1-5)">
-
-            <button onclick="generatePlan()">Generate Study Plan</button>
+        <!-- GENERATED PLAN -->
+        <section class="card" id="planOutput">
+            <h3>Generated Plan will appear here</h3>
         </section>
 
-        <!-- GENERATED PLAN OUTPUT -->
-        <section id="planOutput" class="card">
-            <h3>Your AI Plan will appear here</h3>
+        <!-- ANALYTICS -->
+        <section class="card" id="analyticsDashboard">
+            <h2>📊 Analytics</h2>
+            <p>Total Subjects: <span id="totalSubjects">0</span></p>
+            <p>Total Study Hours: <span id="totalHours">0</span></p>
         </section>
 
-        <!-- RESET BUTTON -->
-        <section class="card">
-            <button onclick="resetPlanner()">Reset Planner</button>
+        <!-- BADGES -->
+        <section class="card" id="badgeDashboard">
+            <h2>🏆 Badges</h2>
+            <p id="badgeText">No badges yet</p>
         </section>
 
     </div>
