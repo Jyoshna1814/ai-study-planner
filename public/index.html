@@ -1,145 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AI Smart Study Planner</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Smart Study Planner</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="app">
+    <!-- TOP HEADER -->
+    <header class="top-bar">
+        <h1>AI Smart Study Planner</h1>
+    </header>
 
-  <!-- HOME SCREEN -->
-  <section id="home" class="screen active">
-    <div class="header">
-      <h2>Good Morning 👋</h2>
-      <p>Let's study smart today</p>
+    <!-- MAIN DASHBOARD -->
+    <div class="container">
+
+        <!-- GREETING -->
+        <section class="card">
+            <h2>Good Morning 👋</h2>
+            <p>Let's study smart today</p>
+        </section>
+
+        <!-- STREAK + PROGRESS -->
+        <section class="dashboard-grid">
+            <div class="card">
+                <h3 id="streakCount">5 Day Streak 🔥</h3>
+                <p>Consistency</p>
+            </div>
+
+            <div class="card">
+                <h3>Tasks</h3>
+                <p id="taskSummary">0 Today</p>
+            </div>
+
+            <div class="card">
+                <h3>Study</h3>
+                <p>2h 30m</p>
+            </div>
+
+            <div class="card progress-card">
+                <div id="progressCircle">0%</div>
+            </div>
+        </section>
+
+        <!-- TASK HISTORY -->
+        <section class="card">
+            <h3>Today's Tasks</h3>
+            <div id="taskList"></div>
+        </section>
+
+        <!-- AI FORM -->
+        <section class="card">
+            <h2>🧠 AI Study Plan Generator</h2>
+
+            <input type="text" id="subject" placeholder="Enter Subject">
+
+            <input type="text" id="task" placeholder="Enter Task">
+
+            <input type="date" id="examDate">
+
+            <input type="number" id="studyHours" placeholder="Available Study Hours">
+
+            <input type="number" id="weightage" placeholder="Subject Weightage (1-100)">
+
+            <input type="number" id="difficulty" placeholder="Difficulty Level (1-5)">
+
+            <button onclick="generatePlan()">Generate Study Plan</button>
+        </section>
+
+        <!-- GENERATED PLAN OUTPUT -->
+        <section id="planOutput" class="card">
+            <h3>Your AI Plan will appear here</h3>
+        </section>
+
+        <!-- RESET BUTTON -->
+        <section class="card">
+            <button onclick="resetPlanner()">Reset Planner</button>
+        </section>
+
     </div>
 
-    <div class="card stats">
-      <div>
-        <h3>5 Day Streak 🔥</h3>
-        <p>Consistency</p>
-      </div>
-      <div class="progress-circle"><span>78%</span></div>
-    </div>
-
-    <div class="row">
-      <div class="card small">
-        <h3>Tasks</h3>
-        <p>4/6 Today</p>
-      </div>
-      <div class="card small">
-        <h3>Study</h3>
-        <p>2h 30m</p>
-      </div>
-    </div>
-
-   <div class="ai-section">
-   <h3>🧠 AI Study Plan</h3>
-   <p>Fill details below to generate smart plan</p>
-  </div>
-
-    <div class="card" id="aiPlannerCard">
-  <h3>🤖 AI Study Plan</h3>
-  <p id="aiPlanText">Click generate to create tomorrow's smart plan.</p>
-  <button class="start-btn" onclick="generateAIPlan()">
-    Generate Plan
-  </button>
-</div>
-
-    <div class="card">
-    <h3>📈 Smart Insight</h3>
-    <p>You're most productive between 9 AM – 11 AM</p>
-  </div>
-  </section>
-
-  <!-- PLANNER SCREEN -->
-  <section id="planner" class="screen">
-    <h2>📅 Study Planner</h2>
-    <div class="task-card">Maths - 9:00 AM - HIGH</div>
-    <div class="task-card">Physics - 10:30 AM - MED</div>
-    <div class="task-card">Chemistry - 1:00 PM - HIGH</div>
-    <div class="task-card">History - 3:00 PM - LOW</div>
-  </section>
-
-  <!-- ANALYTICS SCREEN -->
-  <section id="analytics" class="screen">
-    <h2>📊 Analytics</h2>
-    <div class="card">
-      <h3>Consistency Score</h3>
-      <div class="big-circle">85%</div>
-    </div>
-    <div class="card">
-      <h3>7 Day Streak 🔥</h3>
-      <p>🔥🔥🔥🔥🔥🔥🔥</p>
-    </div>
-    <div class="card">
-      <h3>Weekly Study</h3>
-      <p>18h 45m</p>
-    </div>
-
-    <div class="card">
-  <h3>📈 Weekly Performance</h3>
-  <p>Study efficiency improved by 15% this week</p>
-</div>
-
-<div class="card">
-  <h3>🎯 Focus Insight</h3>
-  <p>Best focus time: 9 AM – 11 AM</p>
-</div>
-  </section>
-
-  <!-- BADGES SCREEN -->
-  <section id="badges" class="screen">
-    <h2>🏆 Achievements</h2>
-    <div class="badge-grid">
-      <div class="badge unlocked">🔥 First Flame</div>
-      <div class="badge unlocked">⚔ Week Warrior</div>
-      <div class="badge unlocked">✅ Task Starter</div>
-      <div class="badge locked">🔒 10 Hour Club</div>
-      <div class="badge locked">🔒 Perfect Day</div>
-    </div>
-  </section>
-
- <section id="timer" class="screen">
-  <h2>⏱ Focus Timer</h2>
-
-  <div class="big-circle" id="timerDisplay">25:00</div>
-
-  <button class="start-btn" onclick="startTimer()">Start Focus</button>
-
-  <button class="start-btn" onclick="resetTimer()" style="margin-top:10px;">
-    Reset
-  </button>
-
-  <div class="card" style="margin-top:20px;">
-    <h3>🤖 AI Suggestion</h3>
-    <p id="aiSuggestion">Complete Maths first, then revise Physics.</p>
-  </div>
-</section>
-<!-- Bottom Navigation -->
-<div class="bottom-nav">
-  <button onclick="showScreen('home')">🏠</button>
-  <button onclick="showScreen('planner')">📅</button>
-  <button onclick="showScreen('timer')">⏱</button>
-  <button onclick="showScreen('analytics')">📊</button>
-  <button onclick="showScreen('badges')">🏆</button>
-</div>
-<div class="planner-form">
-    <input id="subject" placeholder="Enter Subject">
-    <input id="task" placeholder="Enter Task">
-    <input id="examDate" type="date">
-    <input id="hours" type="number" placeholder="Available Study Hours">
-    <input id="weightage" type="number" placeholder="Weightage">
-    <input id="difficulty" type="number" placeholder="Difficulty (1-5)">
-    
-    <button id="generateBtn">Generate Study Plan</button>
-</div>
-
-<div id="planner-output"></div>
-
-<script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
