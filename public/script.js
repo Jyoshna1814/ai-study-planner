@@ -1,47 +1,41 @@
-async function addTask() {
-    const data = {
-        subject: document.getElementById("subject").value,
-        task: document.getElementById("task").value,
-        examDate: document.getElementById("examDate").value,
-        availableHours: Number(document.getElementById("hours").value),
-        weightage: Number(document.getElementById("weightage").value),
-        difficulty: Number(document.getElementById("difficulty").value)
-    };
+document.addEventListener("DOMContentLoaded", () => {
+    const btn = document.getElementById("generateBtn");
 
-    await fetch("/add-task", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(data)
-    });
+    btn.addEventListener("click", generatePlan);
+});
 
-    loadPlanner();
-}
-
-async function loadPlanner() {
-    const res = await fetch("/planner");
-    const tasks = await res.json();
+function generatePlan() {
+    const subject = document.getElementById("subject").value;
+    const task = document.getElementById("task").value;
+    const examDate = document.getElementById("examDate").value;
+    const hours = document.getElementById("hours").value;
+    const weightage = document.getElementById("weightage").value;
+    const difficulty = document.getElementById("difficulty").value;
 
     const output = document.getElementById("planner-output");
 
-    output.innerHTML = tasks.map(task => `
+    if (!subject || !task) {
+        output.innerHTML = "<p style='color:red'>Please fill all details</p>";
+        return;
+    }
+
+    const daysLeft = Math.ceil(
+        (new Date(examDate) - new Date()) / (1000 * 60 * 60 * 24)
+    );
+
+    const priority =
+        Number(weightage) * 3 +
+        Number(difficulty) * 2 +
+        (30 - daysLeft);
+
+    output.innerHTML = `
         <div class="task-card">
-            <h3>${task.subject}</h3>
-            <p>${task.task}</p>
-            <p>Priority: ${task.priority}</p>
-            <p>Exam: ${task.examDate}</p>
-            <button onclick="completeTask('${task._id}')">Complete</button>
+            <h3>${subject}</h3>
+            <p><b>Task:</b> ${task}</p>
+            <p><b>Study Hours:</b> ${hours}</p>
+            <p><b>Exam Date:</b> ${examDate}</p>
+            <p><b>Days Left:</b> ${daysLeft}</p>
+            <p><b>Priority Score:</b> ${priority}</p>
         </div>
-    `).join("");
+    `;
 }
-
-async function completeTask(id) {
-    await fetch(`/complete-task/${id}`, {
-        method: "PUT"
-    });
-
-    loadPlanner();
-}
-
-loadPlanner();

@@ -174,3 +174,33 @@ button{
     border:none;
     border-radius:10px;
 }
+.planner-form{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    padding:20px;
+    margin:20px;
+}
+
+.planner-form input{
+    padding:10px;
+    border-radius:8px;
+    border:none;
+}
+
+#generateBtn{
+    padding:12px;
+    border:none;
+    border-radius:8px;
+    background:#00d4ff;
+    color:white;
+    cursor:pointer;
+}
+
+.task-card{
+    background:#111827;
+    color:white;
+    padding:15px;
+    margin:10px;
+    border-radius:12px;
+}
