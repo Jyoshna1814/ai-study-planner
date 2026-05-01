@@ -3,7 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <title>AI Smart Study Planner</title>
-    <link rel="stylesheet" href="style.css">
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #0b132b;
+            color: white;
+            padding: 20px;
+        }
+
+        h1, h2 {
+            text-align: center;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: #1c2541;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .subject-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        input {
+            padding: 8px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            background: cyan;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+        #output, #timetable {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 
 <body>
@@ -14,27 +68,27 @@
     <div class="dashboard">
 
         <div class="card">
-            <h2>Progress</h2>
+            <h3>Progress</h3>
             <p id="progress">0%</p>
         </div>
 
         <div class="card">
-            <h2>Days Left</h2>
+            <h3>Days Left</h3>
             <p id="daysLeft">0</p>
         </div>
 
         <div class="card">
-            <h2>Total Subjects</h2>
+            <h3>Total Subjects</h3>
             <p id="totalSubjects">0</p>
         </div>
 
         <div class="card">
-            <h2>Total Study Hours</h2>
+            <h3>Total Study Hours</h3>
             <p id="totalHours">0</p>
         </div>
 
         <div class="card">
-            <h2>Badges</h2>
+            <h3>Badges</h3>
             <p id="badges">No badges yet</p>
         </div>
 
@@ -42,21 +96,25 @@
 
     <hr>
 
-    <!-- AI PLANNER INPUT -->
+    <!-- AI PLANNER -->
     <h2>🧠 AI Planner</h2>
 
-    <div id="subjects-container">
-        <!-- Subjects will be added here -->
-    </div>
+    <div id="subjects-container"></div>
 
-    <button onclick="addSubject()">➕ Add Subject</button>
-    <button onclick="generatePlan()">⚡ Generate AI Plan</button>
+    <div style="text-align:center; margin-top:10px;">
+        <button onclick="addSubject()">➕ Add Subject</button>
+        <button onclick="generatePlan()">⚡ Generate AI Plan</button>
+    </div>
 
     <hr>
 
-    <!-- OUTPUT -->
-    <h2>📅 Generated Study Plan</h2>
+    <!-- STUDY PLAN OUTPUT -->
+    <h2>📅 Study Plan</h2>
     <div id="output"></div>
+
+    <!-- TIMETABLE -->
+    <h2>⏰ Daily Timetable</h2>
+    <div id="timetable"></div>
 
     <!-- SCRIPT -->
     <script src="script.js"></script>
