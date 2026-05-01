@@ -1,75 +1,97 @@
-let streak = 5;
+let subjects = [];
 
+// ADD SUBJECT
 function addSubject() {
-    let container = document.getElementById("subjectContainer");
+    const container = document.getElementById("subjects-container");
 
-    container.innerHTML += `
-        <div class="subject-row">
-            <input type="text" class="subject" placeholder="Subject Name">
-            <input type="date" class="examDate">
-            <input type="number" class="studyHours" placeholder="Hours">
-            <input type="number" class="weightage" placeholder="Weightage">
-            <input type="number" class="difficulty" placeholder="Difficulty">
-            <button onclick="deleteSubject(this)">Delete</button>
-        </div>
+    const div = document.createElement("div");
+    div.classList.add("subject-row");
+
+    div.innerHTML = `
+        <input placeholder="Subject Name" class="name">
+        <input type="date" class="date">
+        <input type="number" placeholder="Hours" class="hours">
+        <input type="number" placeholder="Weightage" class="weight">
+        <input type="number" placeholder="Difficulty (1-5)" class="difficulty">
+        <button onclick="this.parentElement.remove()">Delete</button>
     `;
+
+    container.appendChild(div);
 }
 
-function deleteSubject(btn) {
-    btn.parentElement.remove();
-}
-
+// GENERATE PLAN
 function generatePlan() {
-    let subjects = document.querySelectorAll(".subject");
-    let dates = document.querySelectorAll(".examDate");
-    let hours = document.querySelectorAll(".studyHours");
-    let weights = document.querySelectorAll(".weightage");
-    let difficulties = document.querySelectorAll(".difficulty");
+    subjects = [];
 
-    let output = "";
-    let totalHours = 0;
+    const rows = document.querySelectorAll(".subject-row");
 
-    for (let i = 0; i < subjects.length; i++) {
-        let subject = subjects[i].value;
-        let examDate = new Date(dates[i].value);
-        let studyHour = parseInt(hours[i].value);
-        let weight = parseInt(weights[i].value);
-        let difficulty = parseInt(difficulties[i].value);
+    rows.forEach(row => {
+        const name = row.querySelector(".name").value;
+        const date = row.querySelector(".date").value;
+        const hours = Number(row.querySelector(".hours").value);
+        const weight = Number(row.querySelector(".weight").value);
+        const difficulty = Number(row.querySelector(".difficulty").value);
 
-        let today = new Date();
-        let daysLeft = Math.ceil((examDate - today) / (1000 * 60 * 60 * 24));
+        if (!name || !date || !hours) return;
 
-        let requiredHours = Math.ceil((weight * difficulty) / daysLeft);
+        const today = new Date();
+        const examDate = new Date(date);
 
-        if (requiredHours > studyHour) {
-            requiredHours = studyHour;
-        }
+        const diffDays = Math.ceil((examDate - today) / (1000 * 60 * 60 * 24));
 
-        let revision = Math.ceil(requiredHours * 0.3);
+        const dailyStudy = (hours * weight * difficulty) / (diffDays || 1);
+        const revision = dailyStudy * 0.3;
 
-        totalHours += requiredHours;
+        subjects.push({
+            name,
+            daysLeft: diffDays,
+            study: dailyStudy.toFixed(1),
+            revision: revision.toFixed(1)
+        });
+    });
 
-        output += `
+    renderOutput();
+    updateAnalytics();
+}
+
+// OUTPUT UI
+function renderOutput() {
+    const output = document.getElementById("output");
+    output.innerHTML = "";
+
+    subjects.forEach(sub => {
+        output.innerHTML += `
             <div class="card">
-                <h3>${subject}</h3>
-                <p>Days Left: ${daysLeft}</p>
-                <p>Today's Study: ${requiredHours} hrs</p>
-                <p>Revision: ${revision} hr</p>
+                <h3>${sub.name}</h3>
+                <p>Days Left: ${sub.daysLeft}</p>
+                <p>Today's Study: ${sub.study} hrs</p>
+                <p>Revision: ${sub.revision} hrs</p>
             </div>
         `;
+    });
+}
 
-        document.getElementById("daysLeftBox").innerText = daysLeft;
-    }
+// ANALYTICS + PROGRESS
+function updateAnalytics() {
+    let totalSubjects = subjects.length;
+    let totalHours = 0;
 
-    document.getElementById("planOutput").innerHTML = output;
+    subjects.forEach(s => {
+        totalHours += Number(s.study);
+    });
 
-    document.getElementById("totalSubjects").innerText = subjects.length;
-    document.getElementById("totalHours").innerText = totalHours;
+    document.getElementById("totalSubjects").innerText = totalSubjects;
+    document.getElementById("totalHours").innerText = totalHours.toFixed(1);
 
-    let progress = Math.min(100, totalHours * 10);
-    document.getElementById("progressCircle").innerText = progress + "%";
+    // progress fake logic (demo)
+    let progress = totalSubjects > 0 ? 20 * totalSubjects : 0;
+    document.getElementById("progress").innerText = progress + "%";
 
-    if (progress >= 80) {
-        document.getElementById("badgeText").innerText = "🔥 Study Warrior Badge Unlocked";
+    // badges
+    const badge = document.getElementById("badges");
+    if (progress > 50) {
+        badge.innerText = "🔥 Consistent Learner";
+    } else {
+        badge.innerText = "No badges yet";
     }
 }

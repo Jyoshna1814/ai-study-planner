@@ -2,79 +2,64 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Smart Study Planner</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    <header class="top-bar">
-        <h1>AI Smart Study Planner</h1>
-    </header>
 
-    <div class="container">
+    <h1>📘 AI Smart Study Planner</h1>
 
-        <!-- HOME DASHBOARD -->
-        <section class="card" id="homeDashboard">
-            <h2>Good Morning 👋</h2>
-            <p>Let's study smart today</p>
+    <!-- DASHBOARD -->
+    <div class="dashboard">
 
-            <div class="dashboard-grid">
-                <div class="card">
-                    <h3 id="streakCount">5 Day Streak 🔥</h3>
-                    <p>Consistency</p>
-                </div>
+        <div class="card">
+            <h2>Progress</h2>
+            <p id="progress">0%</p>
+        </div>
 
-                <div class="card">
-                    <h3>Progress</h3>
-                    <p id="progressCircle">0%</p>
-                </div>
+        <div class="card">
+            <h2>Days Left</h2>
+            <p id="daysLeft">0</p>
+        </div>
 
-                <div class="card">
-                    <h3>Days Left</h3>
-                    <p id="daysLeftBox">--</p>
-                </div>
-            </div>
-        </section>
+        <div class="card">
+            <h2>Total Subjects</h2>
+            <p id="totalSubjects">0</p>
+        </div>
 
-        <!-- PLANNER DASHBOARD -->
-        <section class="card" id="plannerDashboard">
-            <h2>📅 AI Planner</h2>
+        <div class="card">
+            <h2>Total Study Hours</h2>
+            <p id="totalHours">0</p>
+        </div>
 
-            <div id="subjectContainer">
-                <div class="subject-row">
-                    <input type="text" class="subject" placeholder="Subject Name">
-                    <input type="date" class="examDate">
-                    <input type="number" class="studyHours" placeholder="Hours">
-                    <input type="number" class="weightage" placeholder="Weightage">
-                    <input type="number" class="difficulty" placeholder="Difficulty">
-                    <button onclick="deleteSubject(this)">Delete</button>
-                </div>
-            </div>
-
-            <button onclick="addSubject()">+ Add Subject</button>
-            <button onclick="generatePlan()">Generate AI Plan</button>
-        </section>
-
-        <!-- GENERATED PLAN -->
-        <section class="card" id="planOutput">
-            <h3>Generated Plan will appear here</h3>
-        </section>
-
-        <!-- ANALYTICS -->
-        <section class="card" id="analyticsDashboard">
-            <h2>📊 Analytics</h2>
-            <p>Total Subjects: <span id="totalSubjects">0</span></p>
-            <p>Total Study Hours: <span id="totalHours">0</span></p>
-        </section>
-
-        <!-- BADGES -->
-        <section class="card" id="badgeDashboard">
-            <h2>🏆 Badges</h2>
-            <p id="badgeText">No badges yet</p>
-        </section>
+        <div class="card">
+            <h2>Badges</h2>
+            <p id="badges">No badges yet</p>
+        </div>
 
     </div>
 
+    <hr>
+
+    <!-- AI PLANNER INPUT -->
+    <h2>🧠 AI Planner</h2>
+
+    <div id="subjects-container">
+        <!-- Subjects will be added here -->
+    </div>
+
+    <button onclick="addSubject()">➕ Add Subject</button>
+    <button onclick="generatePlan()">⚡ Generate AI Plan</button>
+
+    <hr>
+
+    <!-- OUTPUT -->
+    <h2>📅 Generated Study Plan</h2>
+    <div id="output"></div>
+
+    <!-- SCRIPT -->
     <script src="script.js"></script>
+
 </body>
 </html>

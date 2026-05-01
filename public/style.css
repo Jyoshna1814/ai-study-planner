@@ -206,3 +206,15 @@ button{
     margin:15px;
     border-radius:12px;
 }
+.subject-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.card {
+    background: #0d1b2a;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 10px;
+}
