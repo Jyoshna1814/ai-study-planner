@@ -1,146 +1,162 @@
-// ===== GLOBAL DATA =====
 let subjects = [];
-let history = JSON.parse(localStorage.getItem("studyData")) || [];
+let timerInterval;
 
-// ===== HELPER: FORMAT HOURS =====
-function formatTime(hours) {
-    let h = Math.floor(hours);
-    let m = Math.round((hours - h) * 60);
-    return `${h} hr ${m} min`;
+/* NOTIFICATION PERMISSION */
+if ("Notification" in window) {
+  Notification.requestPermission();
 }
 
-// ===== ADD SUBJECT ROW =====
-function addSubject() {
-    const container = document.getElementById("subjects-container");
+/* SERVICE WORKER */
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js");
+}
 
-    const div = document.createElement("div");
-    div.className = "subject-row";
+/* ADD SUBJECT */
+function addSubject(){
+  let div=document.createElement("div");
 
-    div.innerHTML = `
-        <input placeholder="Subject Name" class="name">
-        <input type="date" class="date">
-        <input type="number" placeholder="Total Study Hours" class="hours">
-        <input type="number" placeholder="Weightage" class="weight">
-        <input type="number" placeholder="Difficulty (1-5)" class="difficulty">
-        <button onclick="this.parentElement.remove()">Delete</button>
+  div.innerHTML=`
+    <input placeholder="Subject">
+    <input type="date">
+    <input placeholder="Hours">
+    <input placeholder="Weight">
+    <input placeholder="Difficulty">
+    <button onclick="this.parentElement.remove()">X</button>
+  `;
+
+  document.getElementById("subjects").appendChild(div);
+}
+
+/* GENERATE PLAN */
+function generatePlan(){
+  subjects=[];
+
+  document.querySelectorAll("#subjects div").forEach(row=>{
+    let i=row.querySelectorAll("input");
+
+    let subject=i[0].value;
+    let date=new Date(i[1].value);
+    let hours=parseFloat(i[2].value);
+    let weight=parseFloat(i[3].value);
+    let difficulty=parseFloat(i[4].value);
+
+    if(!subject || isNaN(hours)) return;
+
+    let today=new Date();
+    let days=Math.ceil((date-today)/(1000*60*60*24));
+    if(days<=0) days=1;
+
+    let total=hours+(weight*difficulty/10);
+
+    subjects.push({subject,days,total,completed:0});
+  });
+
+  showPlan();
+  showTable();
+  updateDashboard();
+
+  sendReminder("Study plan ready!");
+}
+
+/* PLAN */
+function showPlan(){
+  let p=document.getElementById("plan");
+  p.innerHTML="";
+
+  subjects.forEach((s,i)=>{
+    let daily=s.total/s.days;
+
+    p.innerHTML+=`
+      <p>
+      <b>${s.subject}</b><br>
+      Study: ${format(daily)}<br>
+      <button onclick="completeTask(${i})">Done</button>
+      </p>
     `;
-
-    container.appendChild(div);
+  });
 }
 
-// ===== GENERATE AI PLAN =====
-function generatePlan() {
-    subjects = [];
-    const rows = document.querySelectorAll(".subject-row");
-
-    rows.forEach(row => {
-        const name = row.querySelector(".name").value.trim();
-        const date = row.querySelector(".date").value;
-        const hours = Number(row.querySelector(".hours").value);
-        const weight = Number(row.querySelector(".weight").value);
-        const difficulty = Number(row.querySelector(".difficulty").value);
-
-        if (!name || !date || !hours) return;
-
-        const today = new Date();
-        const examDate = new Date(date);
-
-        const daysLeft = Math.ceil((examDate - today) / (1000 * 60 * 60 * 24));
-
-        if (daysLeft <= 0) return;
-
-        // BASE CALCULATION
-        let dailyStudy = (hours * (weight || 1) * (difficulty || 1)) / daysLeft;
-
-        // MISSED TASK CARRY FORWARD
-        const prev = history.find(h => h.name === name);
-        if (prev && prev.remaining > 0) {
-            dailyStudy += prev.remaining / daysLeft;
-        }
-
-        const revision = dailyStudy * 0.3;
-
-        subjects.push({
-            name,
-            daysLeft,
-            study: dailyStudy,
-            revision,
-            remaining: hours - dailyStudy
-        });
-    });
-
-    // SAVE DATA
-    localStorage.setItem("studyData", JSON.stringify(subjects));
-
-    renderPlan();
-    generateTimetable();
-    updateDashboard();
+/* COMPLETE */
+function completeTask(i){
+  subjects[i].completed=1;
+  updateDashboard();
 }
 
-// ===== SHOW STUDY PLAN =====
-function renderPlan() {
-    const output = document.getElementById("output");
-    output.innerHTML = "";
+/* TIMETABLE */
+function showTable(){
+  let t=document.getElementById("timetable");
+  t.innerHTML="";
 
-    subjects.forEach(sub => {
-        output.innerHTML += `
-            <div class="card">
-                <h3>${sub.name}</h3>
-                <p>Days Left: ${sub.daysLeft}</p>
-                <p>Study: ${formatTime(sub.study)}</p>
-                <p>Revision: ${formatTime(sub.revision)}</p>
-            </div>
-        `;
-    });
+  let start=8;
+
+  subjects.forEach(s=>{
+    let daily=s.total/s.days;
+    let end=start+daily;
+
+    t.innerHTML+=`<p>${s.subject}: ${time(start)} - ${time(end)}</p>`;
+    start=end;
+  });
 }
 
-// ===== DAILY TIMETABLE =====
-function generateTimetable() {
-    const table = document.getElementById("timetable");
-    table.innerHTML = "";
+/* DASHBOARD */
+function updateDashboard(){
+  let total=subjects.reduce((a,b)=>a+b.total,0);
+  let completed=subjects.filter(s=>s.completed).length;
 
-    let startHour = 9;
+  let progress=(completed/subjects.length)*100 || 0;
 
-    subjects.forEach(sub => {
-        let duration = sub.study;
-        let end = startHour + duration;
+  document.getElementById("progressText").innerText=progress.toFixed(0)+"%";
+  document.getElementById("progressBar").style.width=progress+"%";
 
-        table.innerHTML += `
-            <div class="card">
-                <p><b>${sub.name}</b></p>
-                <p>${Math.floor(startHour)}:00 - ${Math.floor(end)}:00</p>
-            </div>
-        `;
+  document.getElementById("totalTime").innerText=format(total);
 
-        startHour = Math.ceil(end);
-    });
+  let min=Math.min(...subjects.map(s=>s.days));
+  document.getElementById("daysLeft").innerText=min;
 }
 
-// ===== DASHBOARD UPDATE =====
-function updateDashboard() {
-    let totalSubjects = subjects.length;
-    let totalHours = 0;
-    let totalDays = 0;
+/* FORMAT */
+function format(h){
+  let hr=Math.floor(h);
+  let m=Math.round((h-hr)*60);
+  return hr+" hr "+m+" min";
+}
 
-    subjects.forEach(s => {
-        totalHours += s.study;
-        totalDays += s.daysLeft;
-    });
+function time(t){
+  let h=Math.floor(t);
+  let m=Math.round((t-h)*60);
+  return h+":"+m.toString().padStart(2,"0");
+}
 
-    document.getElementById("totalSubjects").innerText = totalSubjects;
-    document.getElementById("totalHours").innerText = formatTime(totalHours);
-    document.getElementById("daysLeft").innerText = totalDays;
+/* TIMER */
+function startTimer(){
+  let t=1500;
 
-    // PROGRESS CALCULATION
-    let progress = totalSubjects ? (100 - (totalDays / (totalSubjects * 10)) * 100) : 0;
-    progress = Math.max(0, Math.min(100, progress));
+  clearInterval(timerInterval);
 
-    document.getElementById("progress").innerText = progress.toFixed(0) + "%";
+  timerInterval=setInterval(()=>{
+    let m=Math.floor(t/60);
+    let s=t%60;
 
-    // BADGES
-    const badge = document.getElementById("badges");
+    document.getElementById("timer").innerText=
+    m+":"+s.toString().padStart(2,"0");
 
-    if (progress > 80) badge.innerText = "🏆 Top Performer";
-    else if (progress > 50) badge.innerText = "🔥 Consistent";
-    else badge.innerText = "📘 Beginner";
+    t--;
+
+    if(t<0){
+      clearInterval(timerInterval);
+      alert("Break Time!");
+    }
+  },1000);
+}
+
+function resetTimer(){
+  clearInterval(timerInterval);
+  document.getElementById("timer").innerText="25:00";
+}
+
+/* NOTIFICATION */
+function sendReminder(msg){
+  if(Notification.permission==="granted"){
+    new Notification("📚 Reminder",{body:msg});
+  }
 }

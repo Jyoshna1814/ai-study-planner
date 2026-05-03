@@ -1,83 +1,70 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const path = require("path");
+const cors = require("cors");
+require("dotenv").config();
+
 const app = express();
 
 app.use(express.json());
+app.use(cors());
 app.use(express.static("public"));
 
-mongoose.connect("YOUR_MONGODB_URL")
-.then(() => console.log("MongoDB Connected"))
-.catch(err => console.log(err));
+/* DB */
+mongoose.connect(process.env.MONGO_URI)
+.then(()=>console.log("MongoDB Connected"))
+.catch(err=>console.log(err));
 
-const taskSchema = new mongoose.Schema({
-    subject: String,
-    task: String,
-    examDate: String,
-    availableHours: Number,
-    weightage: Number,
-    difficulty: Number,
-    completed: {
-        type: Boolean,
-        default: false
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    }
+/* USER MODEL */
+const UserSchema = new mongoose.Schema({
+  email:String,
+  password:String
 });
 
-const Task = mongoose.model("Task", taskSchema);
+const User = mongoose.model("User", UserSchema);
 
-function generatePriority(task) {
-    const daysLeft = Math.ceil(
-        (new Date(task.examDate) - new Date()) / (1000 * 60 * 60 * 24)
-    );
-
-    return (
-        task.weightage * 3 +
-        task.difficulty * 2 +
-        (30 - daysLeft)
-    );
-}
-
-app.post("/add-task", async (req, res) => {
-    const newTask = new Task(req.body);
-    await newTask.save();
-    res.json({ message: "Task Added" });
+/* SUBJECT MODEL */
+const SubjectSchema = new mongoose.Schema({
+  subject:String,
+  hours:Number
 });
 
-app.get("/planner", async (req, res) => {
-    const tasks = await Task.find({ completed: false });
+const Subject = mongoose.model("Subject", SubjectSchema);
 
-    const planner = tasks
-        .map(task => ({
-            ...task._doc,
-            priority: generatePriority(task)
-        }))
-        .sort((a, b) => b.priority - a.priority);
+/* AUTH ROUTES */
 
-    res.json(planner);
+// SIGNUP
+app.post("/signup", async(req,res)=>{
+  const {email,password} = req.body;
+
+  const exist = await User.findOne({email});
+  if(exist) return res.send("User already exists");
+
+  await User.create({email,password});
+  res.send("Signup success");
 });
 
-app.put("/complete-task/:id", async (req, res) => {
-    await Task.findByIdAndUpdate(req.params.id, {
-        completed: true
-    });
+// LOGIN
+app.post("/login", async(req,res)=>{
+  const {email,password} = req.body;
 
-    res.json({ message: "Task Completed" });
+  const user = await User.findOne({email,password});
+  if(!user) return res.send("Invalid credentials");
+
+  res.send("Login success");
 });
 
-app.put("/edit-task/:id", async (req, res) => {
-    await Task.findByIdAndUpdate(req.params.id, req.body);
-    res.json({ message: "Task Updated" });
+/* SUBJECT SAVE */
+app.post("/save", async(req,res)=>{
+  await Subject.deleteMany({});
+  await Subject.insertMany(req.body);
+  res.send("Saved");
 });
 
-app.delete("/delete-task/:id", async (req, res) => {
-    await Task.findByIdAndDelete(req.params.id);
-    res.json({ message: "Task Deleted" });
+app.get("/get", async(req,res)=>{
+  const data = await Subject.find();
+  res.json(data);
 });
 
-app.listen(10000, () => {
-    console.log("Server running on 10000");
-});
+const PORT = process.env.PORT || 10000;
+
+app.listen(PORT, ()=>console.log("Server running on", PORT));

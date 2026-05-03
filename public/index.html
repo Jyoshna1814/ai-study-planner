@@ -1,123 +1,52 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>AI Smart Study Planner</title>
+  <title>Smart Study Planner</title>
 
-    <style>
-        body {
-            font-family: Arial;
-            background: #0b132b;
-            color: white;
-            padding: 20px;
-        }
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
 
-        h1, h2 {
-            text-align: center;
-        }
-
-        .dashboard {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .card {
-            background: #1c2541;
-            padding: 15px;
-            border-radius: 10px;
-        }
-
-        .subject-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-        }
-
-        input {
-            padding: 8px;
-            border-radius: 5px;
-            border: none;
-        }
-
-        button {
-            padding: 8px 12px;
-            border: none;
-            border-radius: 5px;
-            background: cyan;
-            cursor: pointer;
-        }
-
-        button:hover {
-            opacity: 0.8;
-        }
-
-        #output, #timetable {
-            margin-top: 20px;
-        }
-    </style>
 </head>
 
 <body>
 
-    <h1>📘 AI Smart Study Planner</h1>
+<h1>📚 Smart Study Planner</h1>
 
-    <!-- DASHBOARD -->
-    <div class="dashboard">
+<div class="card">
+  <h2>Dashboard</h2>
+  <p>Progress: <span id="progressText">0%</span></p>
+  <div class="progress-container">
+    <div id="progressBar" class="progress-bar"></div>
+  </div>
+  <p>Days Left: <span id="daysLeft">0</span></p>
+  <p>Total Time: <span id="totalTime">0</span></p>
+</div>
 
-        <div class="card">
-            <h3>Progress</h3>
-            <p id="progress">0%</p>
-        </div>
+<div class="card">
+  <h2>Planner</h2>
+  <div id="subjects"></div>
+  <button onclick="addSubject()">Add Subject</button>
+  <button onclick="generatePlan()">Generate Plan</button>
+</div>
 
-        <div class="card">
-            <h3>Days Left</h3>
-            <p id="daysLeft">0</p>
-        </div>
+<div class="card">
+  <h2>Study Plan</h2>
+  <div id="plan"></div>
+</div>
 
-        <div class="card">
-            <h3>Total Subjects</h3>
-            <p id="totalSubjects">0</p>
-        </div>
+<div class="card">
+  <h2>Timetable</h2>
+  <div id="timetable"></div>
+</div>
 
-        <div class="card">
-            <h3>Total Study Hours</h3>
-            <p id="totalHours">0</p>
-        </div>
+<div class="card">
+  <h2>Pomodoro</h2>
+  <h1 id="timer">25:00</h1>
+  <button onclick="startTimer()">Start</button>
+  <button onclick="resetTimer()">Reset</button>
+</div>
 
-        <div class="card">
-            <h3>Badges</h3>
-            <p id="badges">No badges yet</p>
-        </div>
-
-    </div>
-
-    <hr>
-
-    <!-- AI PLANNER -->
-    <h2>🧠 AI Planner</h2>
-
-    <div id="subjects-container"></div>
-
-    <div style="text-align:center; margin-top:10px;">
-        <button onclick="addSubject()">➕ Add Subject</button>
-        <button onclick="generatePlan()">⚡ Generate AI Plan</button>
-    </div>
-
-    <hr>
-
-    <!-- STUDY PLAN OUTPUT -->
-    <h2>📅 Study Plan</h2>
-    <div id="output"></div>
-
-    <!-- TIMETABLE -->
-    <h2>⏰ Daily Timetable</h2>
-    <div id="timetable"></div>
-
-    <!-- SCRIPT -->
-    <script src="script.js"></script>
+<script src="script.js"></script>
 
 </body>
 </html>

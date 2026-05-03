@@ -1,220 +1,57 @@
 body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #07111f;
-  color: white;
+  font-family: Arial;
+  background:#0b132b;
+  color:white;
+  padding:20px;
 }
 
-.app {
-  padding: 20px;
-  padding-bottom: 80px;
-}
-
-.screen {
-  display: none;
-}
-
-.screen.active {
-  display: block;
+h1 {
+  text-align:center;
 }
 
 .card {
-  background: #111827;
-  padding: 15px;
-  border-radius: 15px;
-  margin-top: 15px;
-  box-shadow: 0 0 12px rgba(0,255,255,0.08);
+  background:#1c2541;
+  padding:15px;
+  margin:15px 0;
+  border-radius:12px;
 }
 
-.stats {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+input {
+  margin:5px;
+  padding:8px;
+  border-radius:5px;
+  border:none;
 }
 
-.row {
-  display: flex;
-  gap: 10px;
+button {
+  margin:5px;
+  padding:8px 12px;
+  background:#00c2ff;
+  border:none;
+  border-radius:6px;
+  color:white;
+  cursor:pointer;
 }
 
-.small {
-  flex: 1;
+.progress-container {
+  background:#333;
+  border-radius:10px;
 }
 
-.progress-circle,
-.big-circle {
-  width: 80px;
-  height: 80px;
-  border: 4px solid cyan;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.progress-bar {
+  height:20px;
+  width:0%;
+  background:#00f2fe;
 }
+@media(max-width:600px){
+  body { padding:10px; }
 
-.big-circle {
-  width: 120px;
-  height: 120px;
-  margin: 20px auto;
-}
-
-.task,
-.task-card {
-  background: #1f2937;
-  padding: 12px;
-  border-radius: 10px;
-  margin-top: 10px;
-}
-
-.task {
-  display: flex;
-  justify-content: space-between;
-}
-
-.badge-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 15px;
-  margin-top: 20px;
-}
-
-.badge {
-  padding: 20px;
-  border-radius: 15px;
-  text-align: center;
-}
-
-.unlocked {
-  background: #1e293b;
-  box-shadow: 0 0 15px rgba(0,255,255,0.2);
-}
-
-.locked {
-  background: #374151;
-  opacity: 0.6;
-}
-
-.start-btn {
-  width: 100%;
-  padding: 15px;
-  border: none;
-  border-radius: 12px;
-  background: cyan;
-  font-weight: bold;
-}
-
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  background: #111827;
-  display: flex;
-  justify-content: space-around;
-  padding: 12px 0;
-}
-
-.bottom-nav button {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 22px;
-}
-#addTaskBtn {
-  margin-top: 10px;
-  margin-bottom: 15px;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 10px;
-  background: cyan;
-  color: black;
-  font-weight: bold;
-  cursor: pointer;
-}
-.unlocked {
-  background: #1e293b;
-  box-shadow: 0 0 15px cyan;
-}
-
-.locked {
-  background: #374151;
-  opacity: 0.4;
-}
-.badge {
-  border-radius: 16px;
-  padding: 15px;
-  transition: 0.3s ease;
-}
-
-.badge.unlocked {
-  transform: scale(1.03);
-}
-#aiPlannerCard {
-  margin-top: 20px;
-  padding: 20px;
-  border-radius: 18px;
-  box-shadow: 0 0 12px rgba(0,255,255,0.2);
-}
-.planner-form{
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-    padding:20px;
-}
-
-.planner-form input{
-    padding:12px;
-    border-radius:10px;
-    border:none;
-}
-
-button{
-    padding:12px;
-    background:#00d4ff;
-    color:white;
-    border:none;
-    border-radius:10px;
-}
-.planner-form{
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-    padding:20px;
-    margin:20px;
-}
-
-.planner-form input{
-    padding:10px;
-    border-radius:8px;
-    border:none;
-}
-
-#generateBtn{
+  input,button {
     width:100%;
-    padding:12px;
-    border:none;
-    border-radius:8px;
-    background:#00d4ff;
-    color:white;
-    cursor:pointer;
-    margin-top:10px;
-}
+    margin:5px 0;
+  }
 
-.task-card{
-    background:#111827;
-    color:white;
-    padding:15px;
-    margin:15px;
-    border-radius:12px;
-}
-.subject-row {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
-}
-
-.card {
-    background: #0d1b2a;
-    padding: 15px;
-    margin: 10px 0;
-    border-radius: 10px;
+  .card {
+    padding:10px;
+  }
 }
