@@ -11,6 +11,7 @@
 <body>
 
 <h1>📚 Smart Study Planner</h1>
+<button onclick="logout()">Logout</button>
 
 <div class="card">
   <h2>Dashboard</h2>
@@ -45,6 +46,17 @@
   <button onclick="startTimer()">Start</button>
   <button onclick="resetTimer()">Reset</button>
 </div>
+<script>
+function logout(){
+  localStorage.removeItem("user");
+  window.location.href="login.html";
+}
+
+// PAGE PROTECTION
+if(!localStorage.getItem("user")){
+  window.location.href="login.html";
+}
+</script>
 
 <script src="script.js"></script>
 

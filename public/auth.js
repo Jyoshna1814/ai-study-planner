@@ -25,6 +25,7 @@ async function login(){
   let data=await res.text();
 
   if(data==="Login success"){
+    localStorage.setItem("user",email);
     window.location.href="index.html";
   } else {
     document.getElementById("msg").innerText=data;

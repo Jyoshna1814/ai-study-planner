@@ -66,5 +66,26 @@ app.get("/get", async(req,res)=>{
 });
 
 const PORT = process.env.PORT || 10000;
+let users = [];
+
+app.post("/signup",(req,res)=>{
+  const {email,password} = req.body;
+
+  const exist = users.find(u=>u.email===email);
+  if(exist) return res.send("User exists");
+
+  users.push({email,password});
+  res.send("Signup success");
+});
+
+app.post("/login",(req,res)=>{
+  const {email,password} = req.body;
+
+  const user = users.find(u=>u.email===email && u.password===password);
+
+  if(!user) return res.send("Invalid login");
+
+  res.send("Login success");
+});
 
 app.listen(PORT, ()=>console.log("Server running on", PORT));
